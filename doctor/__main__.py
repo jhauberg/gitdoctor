@@ -17,6 +17,8 @@ import sys
 from docopt import docopt
 
 from doctor import exit_if_not_compatible, __version__
+from doctor.examine import diagnose
+from doctor.scrub import trim
 
 import doctor.repo as repo
 
@@ -38,6 +40,9 @@ def main():
 
     args = docopt(__doc__, argv=argv, version='git-doctor ' + __version__.__version__)
 
+    should_scrub = args['scrub']
+    should_examine = not should_scrub
+
     is_in_repository = repo.is_valid()
 
     if not is_in_repository:
@@ -51,6 +56,11 @@ def main():
                    f'{errors}')
 
         sys.exit(message)
+
+    if should_examine:
+        diagnose()
+    elif should_scrub:
+        trim()
 
     sys.exit(0)
 
