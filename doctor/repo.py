@@ -1,7 +1,7 @@
 # coding=utf-8
 
 """
-Provides utility functions for repositories.
+Provides utility functions for inspecting the current repository.
 """
 
 import os
