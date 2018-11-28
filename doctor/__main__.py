@@ -18,6 +18,8 @@ from docopt import docopt
 
 from doctor import exit_if_not_compatible, __version__
 
+import doctor.repo as repo
+
 
 def main():
     """ Entry point for invoking the git-doctor cli. """
@@ -35,6 +37,11 @@ def main():
     argv[0] = 'doctor'
 
     args = docopt(__doc__, argv=argv, version='git-doctor ' + __version__.__version__)
+
+    is_in_repository = repo.is_valid()
+
+    if not is_in_repository:
+        sys.exit('Not a git repository')
 
     sys.exit(0)
 
