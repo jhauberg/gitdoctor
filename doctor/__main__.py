@@ -43,6 +43,15 @@ def main():
     if not is_in_repository:
         sys.exit('Not a git repository')
 
+    has_integrity, issues = repo.has_integrity()
+
+    if not has_integrity:
+        errors = '\n'.join(['  ' + line for line in issues])
+        message = (f'Repository has integrity issues:\n'
+                   f'{errors}')
+
+        sys.exit(message)
+
     sys.exit(0)
 
 
