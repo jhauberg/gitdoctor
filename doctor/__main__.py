@@ -58,7 +58,7 @@ def main():
     if args['scrub']:
         bytes_saved = trim()
 
-        print(f'saved {bytes_saved} bytes', file=sys.stderr)
+        print(f'Saved {bytes_saved} bytes.')
     else:
         diagnose()
 
