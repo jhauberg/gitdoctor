@@ -19,7 +19,7 @@ from docopt import docopt
 
 from doctor import exit_if_not_compatible, __version__
 
-from doctor.examine import diagnose
+from doctor.examine import diagnose, check_integrity
 from doctor.scrub import trim
 
 import doctor.repo as repo
@@ -50,14 +50,10 @@ def main():
     if not repo.exists():
         sys.exit('Not a git repository')
 
-    has_integrity, issues = repo.has_integrity()
+    has_integrity = check_integrity(verbosely=is_verbose)
 
     if not has_integrity:
-        errors = '\n'.join(['  ' + line for line in issues])
-        message = (f'Repository has integrity issues:\n'
-                   f'{errors}')
-
-        sys.exit(message)
+        sys.exit('Repository has integrity issues')
 
     if args['scrub']:
         bytes_saved = trim(verbosely=is_verbose)

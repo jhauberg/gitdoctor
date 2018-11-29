@@ -7,7 +7,7 @@ Provides utility functions for inspecting the current repository.
 import os
 import subprocess
 
-from typing import List
+from doctor import command
 
 
 def can_be_examined() -> bool:
@@ -39,23 +39,6 @@ def exists() -> bool:
         return True
 
     return False
-
-
-def has_integrity() -> (bool, List[str]):
-    """ Return True if repository has been corrupted, False otherwise. """
-
-    result = subprocess.run([
-        'git', 'fsck', '--full', '--strict', '--no-progress'],
-        stdout=subprocess.DEVNULL,  # ignore stdout
-        stderr=subprocess.PIPE,  # capture stderr
-        universal_newlines=True)
-
-    if result.returncode == 0:
-        return True, []
-
-    issues = result.stderr.splitlines()
-
-    return False, issues
 
 
 def absolute_path() -> str:
