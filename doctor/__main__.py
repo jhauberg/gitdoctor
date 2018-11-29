@@ -58,7 +58,7 @@ def main():
         sys.exit(message)
 
     if args['scrub']:
-        bytes_saved = trim()
+        bytes_saved = trim(verbosely=is_verbose)
 
         print(f'Saved {bytes_saved} bytes.')
     else:
