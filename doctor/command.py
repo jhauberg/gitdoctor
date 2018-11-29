@@ -8,11 +8,14 @@ import sys
 import subprocess
 
 
-def execute(cmd: str, message: str=None, verbosely: bool=False):
-    """ Execute a command-line process.
+def execute(cmd: str, message: str=None, verbosely: bool=False, output_always: bool=False) -> int:
+    """ Execute a command-line process and return exit code.
 
     If verbosely is True, display the provided message (optionally), then display the executed
     command and its resulting output.
+
+    If output_always is True, the resulting output is displayed no matter whether verbosely
+    is True or not.
 
     The resulting output of the executed command is not redirected (unless verbosely is False,
     in which case it is quelched), which means it might be printed on either stdout or stderr
@@ -39,8 +42,9 @@ def execute(cmd: str, message: str=None, verbosely: bool=False):
 
         print(diagnostic, file=stream)
 
-    subprocess.run(
+    result = subprocess.run(
         argv,
-        check=True,
-        stdout=sys.stdout if verbosely else subprocess.DEVNULL,
-        stderr=sys.stderr if verbosely else subprocess.DEVNULL)
+        stdout=sys.stdout if verbosely or output_always else subprocess.DEVNULL,
+        stderr=sys.stderr if verbosely or output_always else subprocess.DEVNULL)
+
+    return result.returncode
