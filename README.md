@@ -50,7 +50,7 @@ Assuming the repository is fit and viable for examination, `git-doctor` starts l
 
 **Scrubbing a repository will perform modifications to the files/index.**
 
-A scrubdown performs the basic git housekeeping commands: `gc` and `prune`, ~~then proceeds to remove any unwanted files and redundant branches~~.
+A scrubdown performs the basic git housekeeping commands: [`gc`](https://git-scm.com/docs/git-gc) and [`prune`](https://git-scm.com/docs/git-prune), ~~then proceeds to remove any unwanted files and redundant branches~~.
 
 ## License
 
