@@ -2,12 +2,13 @@
 # coding=utf-8
 
 """
-usage: git doctor
-       git doctor scrub
+usage: git doctor [--verbose]
+       git doctor scrub [--verbose]
 
 OPTIONS
-  -h --help    Show program help
-  --version    Show program version
+  -v --verbose  Show diagnostic messages
+  -h --help     Show program help
+  --version     Show program version
 
 See https://github.com/jhauberg/gitdoctor for additional details.
 """
@@ -41,6 +42,7 @@ def main():
 
     args = docopt(__doc__, argv=argv, version='git-doctor ' + __version__.__version__)
 
+    is_verbose = args['--verbose']
     is_in_repository = repo.is_valid()
 
     if not is_in_repository:
