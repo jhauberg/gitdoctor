@@ -13,13 +13,13 @@ GIT_GC = 'git gc --aggressive --no-prune'  # --auto
 GIT_PRUNE = 'git prune --verbose'
 
 
-def trim(verbosely: bool=False) -> int:
+def trim(verbose: bool=False) -> int:
     """ Trim the repository and return the number of bytes saved. """
 
     size_before = repo.size_in_bytes()
 
-    command.execute(GIT_GC, 'Running garbage collection:', verbosely)
-    command.execute(GIT_PRUNE, 'Pruning unreachable objects:', verbosely)
+    command.execute(GIT_GC, 'Running garbage collection:', verbose)
+    command.execute(GIT_PRUNE, 'Pruning unreachable objects:', verbose)
 
     size_after = repo.size_in_bytes()
 

@@ -8,16 +8,16 @@ import sys
 import subprocess
 
 
-def execute(cmd: str, message: str=None, verbosely: bool=False, output_always: bool=False) -> int:
+def execute(cmd: str, message: str=None, verbose: bool=False, output_always: bool=False) -> int:
     """ Execute a command-line process and return exit code.
 
-    If verbosely is True, display the provided message (optionally), then display the executed
+    If verbose is True, display the provided message (optionally), then display the executed
     command and its resulting output.
 
-    If output_always is True, the resulting output is displayed no matter whether verbosely
+    If output_always is True, the resulting output is displayed no matter whether verbose
     is True or not.
 
-    The resulting output of the executed command is not redirected (unless verbosely is False,
+    The resulting output of the executed command is not redirected (unless verbose is False,
     in which case it is quelched), which means it might be printed on either stdout or stderr
     depending on the program.
     """
@@ -29,7 +29,7 @@ def execute(cmd: str, message: str=None, verbosely: bool=False, output_always: b
     # only apply colors if stream is not piped to a file
     use_colors = stream.isatty() and hasattr(stream, 'isatty')
 
-    if verbosely:
+    if verbose:
         msg_diagnostic = message
         cmd_diagnostic = f'$ {cmd}'
 
@@ -44,7 +44,7 @@ def execute(cmd: str, message: str=None, verbosely: bool=False, output_always: b
 
     result = subprocess.run(
         argv,
-        stdout=sys.stdout if verbosely or output_always else subprocess.DEVNULL,
-        stderr=sys.stderr if verbosely or output_always else subprocess.DEVNULL)
+        stdout=sys.stdout if verbose or output_always else subprocess.DEVNULL,
+        stderr=sys.stderr if verbose or output_always else subprocess.DEVNULL)
 
     return result.returncode

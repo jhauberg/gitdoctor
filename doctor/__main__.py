@@ -50,13 +50,13 @@ def main():
     if not repo.exists():
         sys.exit('Not a git repository')
 
-    has_integrity = check_integrity(verbosely=is_verbose)
+    has_integrity = check_integrity(verbose=is_verbose)
 
     if not has_integrity:
         sys.exit('Repository has integrity issues')
 
     if args['scrub']:
-        bytes_saved = trim(verbosely=is_verbose)
+        bytes_saved = trim(verbose=is_verbose)
 
         print(f'Saved {bytes_saved} bytes.')
     else:
