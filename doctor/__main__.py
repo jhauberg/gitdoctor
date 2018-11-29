@@ -17,6 +17,7 @@ import sys
 from docopt import docopt
 
 from doctor import exit_if_not_compatible, __version__
+
 from doctor.examine import diagnose
 from doctor.scrub import trim
 
@@ -55,7 +56,9 @@ def main():
         sys.exit(message)
 
     if args['scrub']:
-        trim()
+        bytes_saved = trim()
+
+        print(f'saved {bytes_saved} bytes', file=sys.stderr)
     else:
         diagnose()
 
