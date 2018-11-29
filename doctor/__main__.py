@@ -42,10 +42,12 @@ def main():
 
     args = docopt(__doc__, argv=argv, version='git-doctor ' + __version__.__version__)
 
-    is_verbose = args['--verbose']
-    is_in_repository = repo.is_valid()
+    if not repo.can_be_examined():
+        sys.exit('git executable not found')
 
-    if not is_in_repository:
+    is_verbose = args['--verbose']
+
+    if not repo.exists():
         sys.exit('Not a git repository')
 
     has_integrity, issues = repo.has_integrity()

@@ -10,7 +10,21 @@ import subprocess
 from typing import List
 
 
-def is_valid() -> bool:
+def can_be_examined() -> bool:
+    """ Return True if git is installed. """
+
+    result = subprocess.run([
+        'git', '--version'],
+        stdout=subprocess.DEVNULL,  # ignore stdout
+        stderr=subprocess.DEVNULL)  # ignore stderr
+
+    if result.returncode == 0:
+        return True
+
+    return False
+
+
+def exists() -> bool:
     """ Return True if current working directory is inside a repository. """
 
     result = subprocess.run([
