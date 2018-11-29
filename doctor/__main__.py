@@ -40,9 +40,6 @@ def main():
 
     args = docopt(__doc__, argv=argv, version='git-doctor ' + __version__.__version__)
 
-    should_scrub = args['scrub']
-    should_examine = not should_scrub
-
     is_in_repository = repo.is_valid()
 
     if not is_in_repository:
@@ -57,10 +54,10 @@ def main():
 
         sys.exit(message)
 
-    if should_examine:
-        diagnose()
-    elif should_scrub:
+    if args['scrub']:
         trim()
+    else:
+        diagnose()
 
     sys.exit(0)
 
