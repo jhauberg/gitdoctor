@@ -50,7 +50,7 @@ def absolute_path() -> str:
 
     path = result.stdout.decode('utf-8')
 
-    return path
+    return path.strip()
 
 
 def size_in_bytes() -> int:
