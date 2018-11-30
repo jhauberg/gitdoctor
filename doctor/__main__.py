@@ -64,7 +64,7 @@ def main():
 
         report.conclude(f'saved {bytes_saved} bytes', positive=True)
     else:
-        diagnose()
+        diagnose(verbose=is_verbose)
 
     sys.exit(0)
 
