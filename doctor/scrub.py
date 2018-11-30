@@ -5,6 +5,7 @@ Provides cleaning functions for the current repository.
 """
 
 from doctor import command
+from doctor.report import inform
 
 import doctor.repo as repo
 
@@ -18,11 +19,18 @@ def trim(verbose: bool=False) -> int:
 
     size_before = repo.size_in_bytes()
 
-    command.execute(GIT_GC, 'Running garbage collection:', verbose)
-    command.execute(GIT_PRUNE, 'Pruning unreachable objects:', verbose)
+    if verbose:
+        inform('collecting garbage...')
+
+    command.execute(GIT_GC, show_argv=verbose, show_output=verbose)
+
+    if verbose:
+        inform('pruning unreachable objects...')
+
+    command.execute(GIT_PRUNE, show_argv=verbose, show_output=verbose)
 
     size_after = repo.size_in_bytes()
-
-    size_difference = max(size_before, size_after) - min(size_before, size_after)
+    size_difference = (max(size_before, size_after) -
+                       min(size_before, size_after))
 
     return size_difference

@@ -23,6 +23,7 @@ from doctor.examine import diagnose, check_integrity
 from doctor.scrub import trim
 
 import doctor.repo as repo
+import doctor.report as report
 
 
 def main():
@@ -43,22 +44,25 @@ def main():
     args = docopt(__doc__, argv=argv, version='git-doctor ' + __version__.__version__)
 
     if not repo.can_be_examined():
-        sys.exit('git executable not found')
+        report.conclude('git executable not found')
+        sys.exit(1)
 
     is_verbose = args['--verbose']
 
     if not repo.exists():
-        sys.exit('Not a git repository')
+        report.conclude('not a git repository')
+        sys.exit(1)
 
     has_integrity = check_integrity(verbose=is_verbose)
 
     if not has_integrity:
-        sys.exit('Repository has integrity issues')
+        report.conclude('integrity has been corrupted')
+        sys.exit(1)
 
     if args['scrub']:
         bytes_saved = trim(verbose=is_verbose)
 
-        print(f'Saved {bytes_saved} bytes.')
+        report.conclude(f'saved {bytes_saved} bytes', positive=True)
     else:
         diagnose()
 
