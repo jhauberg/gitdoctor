@@ -7,6 +7,25 @@ Provides a common interface for executing commands.
 import sys
 import subprocess
 
+from doctor.report import supports_color
+
+
+def get_argv(cmd: str) -> list:
+    """ Return a list of arguments from a full command. """
+
+    return cmd.strip().split(' ')
+
+
+def display(cmd: str):
+    """ Emit a diagnostic message of a command line. """
+
+    stream = sys.stderr
+
+    diagnostic = f'$ {cmd}'
+    diagnostic = f'\x1b[0;37m{diagnostic}\x1b[0m' if supports_color(stream) else diagnostic
+
+    print(diagnostic, file=stream)
+
 
 def execute(cmd: str, show_argv: bool=False, show_output: bool=False) -> int:
     """ Execute a command-line process and return exit code.
@@ -19,18 +38,10 @@ def execute(cmd: str, show_argv: bool=False, show_output: bool=False) -> int:
     depending on the executed command.
     """
 
-    argv = cmd.strip().split(' ')
-
-    # emit diagnostic output to stderr
-    stream = sys.stderr
-    # only apply colors if stream is not piped to a file
-    use_colors = stream.isatty() and hasattr(stream, 'isatty')
+    argv = get_argv(cmd)
 
     if show_argv:
-        cmd_diagnostic = (f'\x1b[0;37m$ {cmd}\x1b[0m' if use_colors else
-                          f'$ {cmd}')
-
-        print(cmd_diagnostic, file=stream)
+        display(cmd)
 
     result = subprocess.run(
         argv,
