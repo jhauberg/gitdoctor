@@ -25,17 +25,18 @@ Run `git-doctor` from within a git repository:
 $ git doctor
 ```
 
-This initiates an [examination](#examination) of the git repository found in the current working directory, if any. The program exits with a non-zero status if any errors (not defects) were encountered, zero otherwise.
+This initiates an [examination](#examination) of the git repository found in the current working directory. The program exits with a non-zero status if any errors (not defects) were encountered, zero otherwise.
 
 ### Options
 
 ```console
-usage: git doctor
-       git doctor scrub
+usage: git doctor [--verbose]
+       git doctor scrub [--verbose]
 
 OPTIONS
-  -h --help    Show program help
-  --version    Show program version
+  -v --verbose  Show diagnostic messages
+  -h --help     Show program help
+  --version     Show program version
 
 See https://github.com/jhauberg/gitdoctor for additional details.
 ```
