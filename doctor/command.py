@@ -8,18 +8,15 @@ import sys
 import subprocess
 
 
-def execute(cmd: str, message: str=None, verbose: bool=False, output_always: bool=False) -> int:
+def execute(cmd: str, show_argv: bool=False, show_output: bool=False) -> int:
     """ Execute a command-line process and return exit code.
 
-    If verbose is True, display the provided message (optionally), then display the executed
-    command and its resulting output.
+    If show_argv is True, display the executed command and its parameters/arguments.
+    If show_output is True, display the resulting output from the executed command.
 
-    If output_always is True, the resulting output is displayed no matter whether verbose
-    is True or not.
-
-    The resulting output of the executed command is not redirected (unless verbose is False,
+    The resulting output of the executed command is not redirected (unless show_output is False,
     in which case it is quelched), which means it might be printed on either stdout or stderr
-    depending on the program.
+    depending on the executed command.
     """
 
     argv = cmd.strip().split(' ')
@@ -29,22 +26,15 @@ def execute(cmd: str, message: str=None, verbose: bool=False, output_always: boo
     # only apply colors if stream is not piped to a file
     use_colors = stream.isatty() and hasattr(stream, 'isatty')
 
-    if verbose:
-        msg_diagnostic = message
-        cmd_diagnostic = f'$ {cmd}'
+    if show_argv:
+        cmd_diagnostic = (f'\x1b[0;37m$ {cmd}\x1b[0m' if use_colors else
+                          f'$ {cmd}')
 
-        if use_colors:
-            msg_diagnostic = '\x1b[1m' + msg_diagnostic + '\x1b[0m'
-            cmd_diagnostic = '\x1b[0;37m' + cmd_diagnostic + '\x1b[0m'
-
-        diagnostic = (msg_diagnostic + '\n' +
-                      cmd_diagnostic)
-
-        print(diagnostic, file=stream)
+        print(cmd_diagnostic, file=stream)
 
     result = subprocess.run(
         argv,
-        stdout=sys.stdout if verbose or output_always else subprocess.DEVNULL,
-        stderr=sys.stderr if verbose or output_always else subprocess.DEVNULL)
+        stdout=sys.stdout if show_output else subprocess.DEVNULL,
+        stderr=sys.stderr if show_output else subprocess.DEVNULL)
 
     return result.returncode
