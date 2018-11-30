@@ -12,8 +12,19 @@ def supports_color(stream) -> bool:
 
     A stream that is redirected to a file does not support color.
     """
-    
+
     return stream.isatty() and hasattr(stream, 'isatty')
+
+
+def note(message: str):
+    stream = sys.stdout
+
+    output = message
+
+    if supports_color(stream):
+        output = f'\x1b[0;33m{output}\x1b[0m'
+
+    print(output, file=stream)
 
 
 def conclude(message: str, positive: bool=False):
