@@ -7,8 +7,6 @@ Provides utility functions for inspecting the current repository.
 import os
 import subprocess
 
-from doctor import command
-
 
 def can_be_examined() -> bool:
     """ Return True if git is installed. """
@@ -33,7 +31,7 @@ def exists() -> bool:
         stdout=subprocess.PIPE,  # capture stdout
         stderr=subprocess.DEVNULL)  # ignore stderr
 
-    status = str(result.stdout)
+    status = result.stdout.decode('utf-8')
 
     if 'true' in status.lower():
         return True
@@ -50,7 +48,7 @@ def absolute_path() -> str:
         stdout=subprocess.PIPE,  # capture stdout
         stderr=subprocess.DEVNULL)  # ignore stderr
 
-    path = str(result.stdout)
+    path = result.stdout.decode('utf-8')
 
     return path
 
