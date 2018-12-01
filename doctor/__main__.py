@@ -63,17 +63,20 @@ def main():
     if args['scrub']:
         size_in_bytes = trim(verbose=is_verbose)
 
-        if size_in_bytes > 0:
+        if size_difference != 0:
+            shrunk = size_difference < 0
+
             size_variants = ('B', 'KB', 'MB')
-            size_index = int(math.floor(math.log(size_in_bytes, 1024)))
-            size = round(size_in_bytes / math.pow(1024, size_index), 2)
+            size_index = int(math.floor(math.log(abs(size_difference), 1024)))
+            size = round(abs(size_difference) / math.pow(1024, size_index), 2)
 
             size_type = size_variants[size_index]
 
             precision = 2 if size_index > 1 else 0
             result = f'{size:.{precision}f}{size_type}'
 
-            report.conclude(f'restored approximately {result} of disk space', positive=True)
+            if shrunk:
+                report.conclude(f'restored approximately {result} of disk space', positive=True)
     else:
         diagnose(verbose=is_verbose)
 

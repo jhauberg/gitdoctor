@@ -13,11 +13,13 @@ GIT_GC = 'git gc --aggressive --no-prune'  # --auto
 GIT_PRUNE = 'git prune --verbose'
 
 
-def trim(verbose: bool=False) -> int:
-    """ Trim the repository and return the number of bytes saved. """
+def trim(aggressively: bool=False, verbose: bool=False) -> int:
+    """ Trim the repository and return the difference (in bytes) from before and after.
+
+    The difference is negative if the respository became smaller, positive if it became larger.
+    """
 
     size_before = repo.size_in_bytes()
-
 
     command.execute(GIT_GC, show_argv=verbose, show_output=verbose)
 
@@ -25,7 +27,6 @@ def trim(verbose: bool=False) -> int:
     command.execute(GIT_PRUNE, show_argv=verbose, show_output=verbose)
 
     size_after = repo.size_in_bytes()
-    size_difference = (max(size_before, size_after) -
-                       min(size_before, size_after))
+    size_difference = size_before - size_after
 
-    return size_difference
+    return -size_difference
