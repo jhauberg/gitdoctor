@@ -3,9 +3,10 @@
 
 """
 usage: git doctor [--verbose]
-       git doctor scrub [--verbose]
+       git doctor scrub [--full] [--verbose]
 
 OPTIONS
+  -f --full     Run a full scrubdown (might take a while)
   -v --verbose  Show diagnostic messages
   -h --help     Show program help
   --version     Show program version
@@ -61,7 +62,7 @@ def main():
         sys.exit(1)
 
     if args['scrub']:
-        size_in_bytes = trim(verbose=is_verbose)
+        size_difference = trim(aggressively=args['--full'], verbose=is_verbose)
 
         if size_difference != 0:
             shrunk = size_difference < 0
