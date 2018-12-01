@@ -8,14 +8,18 @@ import subprocess
 
 from doctor import command
 
+from doctor.report import note, conclude
+
+GIT_FSCK = 'git fsck --unreachable --strict --full'
+GIT_FSCK_QUIET = GIT_FSCK + ' --no-progress'
 
 
 def check_integrity(verbose: bool=False) -> bool:
     """ Return True if repository has internal consistency, False otherwise. """
 
     status = command.execute(
-        ('git fsck --full --strict --unreachable' if verbose else
-         'git fsck --full --strict --unreachable --no-progress'),
+        (GIT_FSCK if verbose else
+         GIT_FSCK_QUIET),
         show_argv=verbose,
         show_output=True)
 
