@@ -14,6 +14,7 @@ See https://github.com/jhauberg/gitdoctor for additional details.
 """
 
 import sys
+import math
 
 from docopt import docopt
 
@@ -60,9 +61,19 @@ def main():
         sys.exit(1)
 
     if args['scrub']:
-        bytes_saved = trim(verbose=is_verbose)
+        size_in_bytes = trim(verbose=is_verbose)
 
-        report.conclude(f'saved {bytes_saved} bytes', positive=True)
+        if size_in_bytes > 0:
+            size_variants = ('B', 'KB', 'MB')
+            size_index = int(math.floor(math.log(size_in_bytes, 1024)))
+            size = round(size_in_bytes / math.pow(1024, size_index), 2)
+
+            size_type = size_variants[size_index]
+
+            precision = 2 if size_index > 1 else 0
+            result = f'{size:.{precision}f}{size_type}'
+
+            report.conclude(f'restored approximately {result} of disk space', positive=True)
     else:
         diagnose(verbose=is_verbose)
 
