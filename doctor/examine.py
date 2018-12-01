@@ -8,14 +8,10 @@ import subprocess
 
 from doctor import command
 
-from doctor.report import inform, note, conclude
 
 
 def check_integrity(verbose: bool=False) -> bool:
     """ Return True if repository has internal consistency, False otherwise. """
-
-    if verbose:
-        inform('checking internal consistency...')
 
     status = command.execute(
         ('git fsck --full --strict --unreachable' if verbose else
@@ -66,9 +62,6 @@ def get_exclusion_sources(filepaths: list, verbose: bool) -> list:
 
 
 def diagnose(verbose: bool=False):
-    if verbose:
-        inform('looking for unwanted files...')
-
     unwanted_files = find_unwanted_files(verbose)
 
     if len(unwanted_files) > 0:
