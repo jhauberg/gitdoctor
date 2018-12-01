@@ -43,6 +43,28 @@ def find_unwanted_files(verbose: bool=False) -> list:
     return files
 
 
+def get_exclusion_sources(filepaths: list, verbose: bool) -> list:
+    cmd = 'git check-ignore --no-index --verbose ...'
+
+    if verbose:
+        command.display(cmd)
+
+    cmd = cmd.replace('...', ' '.join(filepaths))
+
+    result = subprocess.run(
+        command.get_argv(cmd),
+        stdout=subprocess.PIPE,
+        stderr=subprocess.DEVNULL)
+
+    sources = result.stdout.decode('utf-8').splitlines()
+
+    if len(sources) > 0:
+        # the format is <source>:<linenum>:<pattern>\t<pathname>
+        sources = [':'.join(source.split(':')[:2]) for source in sources]
+
+    return sources
+
+
 def diagnose(verbose: bool=False):
     if verbose:
         inform('looking for unwanted files...')
@@ -50,7 +72,16 @@ def diagnose(verbose: bool=False):
     unwanted_files = find_unwanted_files(verbose)
 
     if len(unwanted_files) > 0:
-        for file in unwanted_files:
+        sources = []
+
+        if verbose:
+            sources = get_exclusion_sources(unwanted_files, verbose)
+
+        for i, file in enumerate(unwanted_files):
+            if verbose and len(sources) > 0:
+                source = sources[i]
+                file = f'{file} ({source})'
+
             note(file)
 
         conclude('unwanted files are being tracked')
