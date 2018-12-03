@@ -19,7 +19,7 @@ import math
 
 from docopt import docopt
 
-from doctor import exit_if_not_compatible, __version__
+from doctor import exit_if_not_compatible, enable_colors, __version__
 
 from doctor.examine import diagnose, check_integrity
 from doctor.scrub import trim
@@ -32,6 +32,7 @@ def main():
     """ Entry point for invoking the git-doctor cli. """
 
     exit_if_not_compatible()
+    enable_colors()
 
     argv = sys.argv
 
