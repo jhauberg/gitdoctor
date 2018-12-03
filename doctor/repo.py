@@ -16,27 +16,26 @@ def can_be_examined() -> bool:
         stdout=subprocess.DEVNULL,  # ignore stdout
         stderr=subprocess.DEVNULL)  # ignore stderr
 
-    if result.returncode == 0:
-        return True
-
-    return False
+    return result.returncode == 0
 
 
 def exists() -> bool:
-    """ Return True if current working directory is inside a repository. """
+    """ Return True if current working directory is inside the work tree of a repository. """
 
     result = subprocess.run([
         'git', 'rev-parse', '--is-inside-work-tree'],
-        check=True,  # print stacktrace on non-zero exit status
         stdout=subprocess.PIPE,  # capture stdout
         stderr=subprocess.DEVNULL)  # ignore stderr
 
+    if result.returncode != 0:
+        # will exit with non-zero code if not in a git repository at all
+        return False
+
     status = result.stdout.decode('utf-8')
 
-    if 'true' in status.lower():
-        return True
-
-    return False
+    # certain checks require being inside the work tree; e.g. not inside .git/
+    # (for example, finding unwanted files through `git ls-files -i`)
+    return 'true' in status.lower()
 
 
 def absolute_path() -> str:

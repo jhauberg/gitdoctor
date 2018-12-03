@@ -52,7 +52,7 @@ def main():
     is_verbose = args['--verbose']
 
     if not repo.exists():
-        report.conclude('not a git repository')
+        report.conclude('must be inside a work tree')
         sys.exit(1)
 
     has_integrity = check_integrity(verbose=is_verbose)
