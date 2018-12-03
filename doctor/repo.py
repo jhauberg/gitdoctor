@@ -11,12 +11,15 @@ import subprocess
 def can_be_examined() -> bool:
     """ Return True if git is installed. """
 
-    result = subprocess.run([
-        'git', '--version'],
-        stdout=subprocess.DEVNULL,  # ignore stdout
-        stderr=subprocess.DEVNULL)  # ignore stderr
+    try:
+        result = subprocess.run([
+            'git', '--version'],
+            stdout=subprocess.DEVNULL,  # ignore stdout
+            stderr=subprocess.DEVNULL)  # ignore stderr
 
-    return result.returncode == 0
+        return result.returncode == 0
+    except OSError:
+        return False
 
 
 def exists() -> bool:
