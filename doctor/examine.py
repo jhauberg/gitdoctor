@@ -71,11 +71,11 @@ def get_exclusion_sources(filepaths: list, verbose: bool) -> list:
 
     sources = result.stdout.decode('utf-8').splitlines()
 
-    if len(sources) > 0:
-        # the format is <source>:<linenum>:<pattern>\t<pathname>
-        sources = [':'.join(source.split(':')[:2]) for source in sources]
+    assert len(sources) == len(filepaths)
 
-    return sources
+    # the format is <source>:<linenum>:<pattern>\t<pathname>
+    # resulting format is <source>:<linenum>
+    return[':'.join(source.split(':')[:2]) for source in sources]
 
 
 def diagnose(verbose: bool=False):
