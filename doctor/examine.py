@@ -34,7 +34,7 @@ def find_unwanted_files(verbose: bool=False) -> list:
         user’s global exclusion file
     """
 
-    cmd = 'git ls-files -i --exclude-standard'
+    cmd = 'git ls-files --ignored --exclude-standard'
 
     if verbose:
         command.display(cmd)
