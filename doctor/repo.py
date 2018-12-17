@@ -42,7 +42,7 @@ def exists() -> bool:
 
 
 def absolute_path() -> str:
-    """ Return the absolute path of the repository. """
+    """ Return the absolute path of current repository. """
 
     result = subprocess.run([
         'git', 'rev-parse', '--show-toplevel'],
@@ -56,7 +56,7 @@ def absolute_path() -> str:
 
 
 def size_in_bytes() -> int:
-    """ Return the size (in bytes) of the entire repository. """
+    """ Return the size (in bytes) of current repository. """
 
     path = absolute_path()
 

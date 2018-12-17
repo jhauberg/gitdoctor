@@ -16,7 +16,7 @@ GIT_PRUNE = 'git prune --verbose'
 
 
 def trim(aggressively: bool=False, verbose: bool=False) -> int:
-    """ Trim the repository and return the difference (in bytes) from before and after.
+    """ Trim current repository and return the difference (in bytes) from before and after.
 
     The difference is negative if the respository became smaller, positive if it became larger.
     """

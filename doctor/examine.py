@@ -27,6 +27,14 @@ def check_integrity(verbose: bool=False) -> bool:
 
 
 def find_unwanted_files(verbose: bool=False) -> list:
+    """ Return a list of files that are being tracked but also match a gitignore-rule.
+
+    Check against any viable gitignore location; e.g. any of the following:
+        .git/info/exclude
+        .gitignore in each directory (at or below current working directory)
+        user’s global exclusion file
+    """
+
     cmd = 'git ls-files -i --exclude-standard'
 
     if verbose:
@@ -44,6 +52,11 @@ def find_unwanted_files(verbose: bool=False) -> list:
 
 
 def get_exclusion_sources(filepaths: list, verbose: bool) -> list:
+    """ Determine which gitignore-rule and file is the source of a file being excluded.
+
+    Return a list that is synchronous and identical in length to the provided filepaths.
+    """
+
     cmd = 'git check-ignore --no-index --verbose ...'
 
     if verbose:
@@ -66,6 +79,8 @@ def get_exclusion_sources(filepaths: list, verbose: bool) -> list:
 
 
 def diagnose(verbose: bool=False):
+    """ Run all diagnostic checks on current repository. """
+
     unwanted_files = find_unwanted_files(verbose)
 
     if len(unwanted_files) > 0:
