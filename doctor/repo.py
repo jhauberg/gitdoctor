@@ -42,7 +42,7 @@ def exists() -> bool:
 
 
 def absolute_path() -> str:
-    """ Return the absolute path of current repository. """
+    """ Return the absolute path to the root of current repository. """
 
     result = subprocess.run([
         'git', 'rev-parse', '--show-toplevel'],
