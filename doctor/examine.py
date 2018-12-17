@@ -82,8 +82,36 @@ def get_exclusion_sources(filepaths: list, verbose: bool) -> list:
     return[':'.join(source.split(':')[:2]) for source in sources]
 
 
+def contains_readme(verbose: bool=False) -> bool:
+    """ Return True if current repository contains README.md at root-level, False otherwise. """
+
+    cmd = 'git ls-files README.md'
+
+    if verbose:
+        command.display(cmd)
+
+    # set the current working directory as root of the repository to limit results to this directory
+    # as the command does not recurse through subdirectories, we should get exactly 1 line of output
+    # if a README.md exists at the root level, 0 otherwise
+    root_path = repo.absolute_path()
+
+    result = subprocess.run(
+        command.get_argv(cmd),
+        cwd=root_path,
+        check=True,
+        stdout=subprocess.PIPE,
+        stderr=subprocess.DEVNULL)
+
+    files = result.stdout.decode('utf-8').splitlines()
+
+    return len(files) == 1
+
+
 def diagnose(verbose: bool=False):
     """ Run all diagnostic checks on current repository. """
+
+    if not contains_readme(verbose):
+        conclude('missing README.md')
 
     unwanted_files = find_unwanted_files(verbose)
 
