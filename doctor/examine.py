@@ -6,8 +6,7 @@ Provides functions for examining and diagnosing defects in the current repositor
 
 import subprocess
 
-from doctor import command
-
+from doctor import command, repo
 from doctor.report import note, conclude
 
 GIT_FSCK = 'git fsck --unreachable --strict --full'
@@ -40,8 +39,13 @@ def find_unwanted_files(verbose: bool=False) -> list:
     if verbose:
         command.display(cmd)
 
+    # we need to set the current working directory as the root of the repository
+    # otherwise we might miss .gitignore files located in directories above
+    root_path = repo.absolute_path()
+
     result = subprocess.run(
         command.get_argv(cmd),
+        cwd=root_path,
         check=True,
         stdout=subprocess.PIPE,
         stderr=subprocess.DEVNULL)
