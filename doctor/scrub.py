@@ -11,8 +11,6 @@ import doctor.repo as repo
 GIT_EXPIRE = 'git reflog expire --expire-unreachable=now --all --stale-fix'
 GIT_GC = 'git gc --prune=now'
 GIT_GC_AGGRESSIVE = GIT_GC + ' --aggressive'
-GIT_REPACK = 'git repack -A -d -q --pack-kept-objects'
-GIT_PRUNE = 'git prune --verbose'
 
 
 def trim(aggressively: bool=False, verbose: bool=False) -> int:
@@ -23,15 +21,15 @@ def trim(aggressively: bool=False, verbose: bool=False) -> int:
 
     size_before = repo.size_in_bytes()
 
+    # expire all reflog entries to unreachable objects immediately, enabling pruning through gc
     command.execute(GIT_EXPIRE, show_argv=verbose, show_output=verbose)
 
+    # run garbage collection; automatically triggers prune, repack and more
     command.execute(
         (GIT_GC_AGGRESSIVE if aggressively else
          GIT_GC),
-        show_argv=verbose, show_output=verbose)
-
-    command.execute(GIT_REPACK, show_argv=verbose, show_output=verbose)
-    command.execute(GIT_PRUNE, show_argv=verbose, show_output=verbose)
+        show_argv=verbose,
+        show_output=verbose)
 
     size_after = repo.size_in_bytes()
     size_difference = size_before - size_after
