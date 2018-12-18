@@ -55,10 +55,16 @@ def absolute_path() -> str:
     return path.strip()
 
 
-def size_in_bytes() -> int:
-    """ Return the size (in bytes) of current repository. """
+def size_in_bytes(exclude_work_tree: bool=False) -> int:
+    """ Return the size (in bytes) of current repository.
+
+    If exclude_work_tree is True, only count size of the .git directory.
+    """
 
     path = absolute_path()
+
+    if exclude_work_tree:
+        path = os.path.join(path, '.git')
 
     files = (os.path.join(dirpath, filename) for dirpath, dirnames, filenames in os.walk(path) for filename in filenames)
     filesizes = [os.path.getsize(filepath) for filepath in files if not os.path.islink(filepath)]
