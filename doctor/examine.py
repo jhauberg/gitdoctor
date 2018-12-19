@@ -9,20 +9,41 @@ import subprocess
 from doctor import command, repo
 from doctor.report import note, conclude
 
-GIT_FSCK = 'git fsck --unreachable --strict --full'
-GIT_FSCK_QUIET = GIT_FSCK + ' --no-progress'
 
-
-def check_integrity(verbose: bool=False) -> bool:
+def check_integrity(verbose: bool=False) -> (bool, list):
     """ Return True if repository has internal consistency, False otherwise. """
 
-    status = command.execute(
-        (GIT_FSCK if verbose else
-         GIT_FSCK_QUIET),
-        show_argv=verbose,
-        show_output=True)
+    cmd = 'git fsck --no-progress --strict --full'
 
-    return status == 0
+    if verbose:
+        command.display(cmd)
+
+    result = subprocess.run(
+        command.get_argv(cmd),
+        stdout=subprocess.DEVNULL,
+        stderr=subprocess.PIPE)
+
+    errors = result.stderr.decode('utf-8').splitlines()
+
+    return result.returncode == 0, errors
+
+
+def find_unreachable_objects(verbose) -> list:
+    """ Return a list of unreachable objects eligible for a scrubdown. """
+
+    cmd = 'git fsck --unreachable'
+
+    if verbose:
+        command.display(cmd)
+
+    result = subprocess.run(
+        command.get_argv(cmd),
+        stdout=subprocess.PIPE,
+        stderr=subprocess.DEVNULL)
+
+    unreachables = result.stdout.decode('utf-8').splitlines()
+
+    return unreachables
 
 
 def find_unwanted_files(verbose: bool=False) -> list:
@@ -112,6 +133,14 @@ def contains_readme(verbose: bool=False) -> bool:
 
 def diagnose(verbose: bool=False):
     """ Run all diagnostic checks on current repository. """
+
+    unreachables = find_unreachable_objects(verbose)
+
+    if len(unreachables) > 0:
+        for unreachable in unreachables:
+            note(unreachable)
+
+        conclude('scrubdown is recommended')
 
     if not contains_readme(verbose):
         conclude('missing README')
