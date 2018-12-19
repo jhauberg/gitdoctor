@@ -131,6 +131,36 @@ def contains_readme(verbose: bool=False) -> bool:
     return len(files) > 0
 
 
+def find_merged_branches(verbose: bool) -> list:
+    """ Return a list of branches (local and remote) that are already merged with master. """
+
+    default_branch_ref = repo.default_branch()
+    default_branch_name = default_branch_ref.split('/')[-1]
+
+    cmd = f'git branch -a --merged {default_branch_name}'
+
+    if verbose:
+        command.display(cmd)
+
+    result = subprocess.run(
+        command.get_argv(cmd),
+        stdout=subprocess.PIPE,
+        stderr=subprocess.DEVNULL)
+
+    output = result.stdout.decode('utf-8').splitlines()
+
+    # trim each output
+    branches = [branch.strip() for branch in output]
+    # remove leading asterisk from current branch
+    branches = [branch[2:] if branch.startswith('*') else branch for branch in branches]
+    # remove default branch references
+    branches = [branch for branch in branches
+                if not branch.endswith(default_branch_ref) and
+                not branch == default_branch_name]
+
+    return branches
+
+
 def diagnose(verbose: bool=False):
     """ Run all diagnostic checks on current repository. """
 
@@ -144,6 +174,14 @@ def diagnose(verbose: bool=False):
 
     if not contains_readme(verbose):
         conclude('missing README')
+
+    redundant_branches = find_merged_branches(verbose)
+
+    if len(redundant_branches) > 0:
+        for branch in redundant_branches:
+            note(branch)
+
+        conclude('redundant branches; already merged with master')
 
     unwanted_files = find_unwanted_files(verbose)
 

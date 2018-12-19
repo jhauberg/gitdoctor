@@ -41,6 +41,20 @@ def exists() -> bool:
     return 'true' in status.lower()
 
 
+def default_branch() -> str:
+    """ Return the symbolic reference to the default branch. """
+
+    result = subprocess.run([
+        'git', 'symbolic-ref', '--short', 'refs/remotes/origin/HEAD'],
+        check=True,  # print stacktrace on non-zero exit status
+        stdout=subprocess.PIPE,  # capture stdout
+        stderr=subprocess.DEVNULL)  # ignore stderr
+
+    name = result.stdout.decode('utf-8')
+
+    return name.strip()
+
+
 def absolute_path() -> str:
     """ Return the absolute path to the root of current repository. """
 
