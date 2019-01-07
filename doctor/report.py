@@ -19,7 +19,6 @@ def supports_color(stream) -> bool:
 
 def note(message: str):
     stream = sys.stdout
-
     output = message
 
     if supports_color(stream):
@@ -28,9 +27,8 @@ def note(message: str):
     print(output, file=stream)
 
 
-def conclude(message: str, positive: bool=False):
+def conclude(message: str, supplement: str=None, positive: bool=False):
     stream = sys.stdout
-
     output = f'doctor: {message}'
 
     if supports_color(stream):
@@ -40,6 +38,9 @@ def conclude(message: str, positive: bool=False):
         output = f'{color}{output}\x1b[0m'
 
     print(output, file=stream)
+
+    if supplement is not None and len(supplement) > 0:
+        inform(supplement)
 
 
 def inform(message: str):

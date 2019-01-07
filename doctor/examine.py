@@ -170,10 +170,15 @@ def diagnose(verbose: bool=False):
         for unreachable in unreachables:
             note(unreachable)
 
-        conclude('scrubdown is recommended')
+        conclude(message='scrubdown is recommended',
+                 supplement='Run a scrubdown using `git doctor scrub`.')
 
     if not contains_readme(verbose):
-        conclude('missing README')
+        conclude(message='missing README',
+                 supplement='A README-file should be added to the root of the repository. '
+                            'Conventionally, this is the entry point for important information '
+                            'related to a project and is expected to contain critical knowledge '
+                            'such as instructions on use.')
 
     redundant_branches = find_merged_branches(verbose)
 
@@ -181,7 +186,9 @@ def diagnose(verbose: bool=False):
         for branch in redundant_branches:
             note(branch)
 
-        conclude('redundant branches; already merged with master')
+        conclude(message='redundant branches; already merged with master',
+                 supplement='These branches should be deleted (both locally and remote) unless '
+                            'they are intentionally long-running and will continue to be used.')
 
     unwanted_files = find_unwanted_files(verbose)
 
@@ -198,4 +205,7 @@ def diagnose(verbose: bool=False):
 
             note(file)
 
-        conclude('unwanted files are being tracked')
+        conclude(message='unwanted files are being tracked',
+                 supplement='Remove unwanted files from being tracked using '
+                            '`git remove --cached <filename>`, or remove them completely (from the '
+                            'filesystem) using `git rm <filename>`.')
