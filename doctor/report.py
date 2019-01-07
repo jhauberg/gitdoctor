@@ -5,6 +5,7 @@ Provides outputting facilities for reports and diagnosis conclusions.
 """
 
 import sys
+import textwrap
 
 
 def supports_color(stream) -> bool:
@@ -43,5 +44,9 @@ def conclude(message: str, positive: bool=False):
 
 def inform(message: str):
     stream = sys.stderr
+    output = f'{message}'
 
-    print(f'doctor: {message}', file=stream)
+    # wrap output so that it does not exceed 70 columns
+    output = textwrap.fill(output, width=70)
+
+    print(output, file=stream)
