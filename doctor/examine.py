@@ -104,12 +104,14 @@ def get_exclusion_sources(filepaths: list, verbose: bool) -> list:
 
 
 def contains_readme(verbose: bool=False) -> bool:
-    """ Return True if current repository contains a README file, False otherwise.
+    """ Return True if current repository tracks a README file, False otherwise.
 
-    Checks for the existence of a file at root-level whose name starts with 'README'.
+    Note that this check only applies to files tracked by the index; return True only if a README-
+    file exists on the filesystem and is also under version control.
     """
 
     # search for existence of any README files, but not recursively
+    # (in tracked files; add --others to search untracked)
     cmd = 'git ls-files README*'
 
     if verbose:
