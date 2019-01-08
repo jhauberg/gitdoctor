@@ -25,7 +25,7 @@ Run `git-doctor` from within a git repository:
 $ git doctor
 ```
 
-This initiates an [examination](#examination) of the git repository found in the current working directory. The program exits with a non-zero status if any program errors (not defects) were encountered, zero otherwise.
+This initiates an [examination](#examination) of the git repository found in the current working directory. The program exits with a non-zero status if any program errors (*not defects*) were encountered, zero otherwise.
 
 ### Options
 
@@ -38,15 +38,13 @@ OPTIONS
   -v --verbose  Show diagnostic messages
   -h --help     Show program help
   --version     Show program version
-
-See https://github.com/jhauberg/gitdoctor for additional details.
 ```
 
 ## Examination
 
 The purpose of an examination is to discover and identify defects in a repository.
 
-Assuming the repository is fit and viable for examination, `git-doctor` starts looking for defects and reports any results along the way. This process consists of various standard git commands and checks. No files are touched during an examination, and the user must manually take action on any reported defects.
+Assuming the repository is fit and viable for examination, `git-doctor` starts looking for defects and reports any results along the way. This process consists of various standard git commands and checks. **No files are touched during an examination**, and the user must manually take action on any reported defects.
 
 ## Scrubdown
 
