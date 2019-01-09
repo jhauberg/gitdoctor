@@ -139,7 +139,7 @@ def find_merged_branches(verbose: bool) -> list:
     default_branch_ref = repo.default_branch()
     default_branch_name = default_branch_ref.split('/')[-1]
 
-    cmd = f'git branch -a --merged {default_branch_name}'
+    cmd = f'git branch -all --merged {default_branch_name}'
 
     if verbose:
         command.display(cmd)
