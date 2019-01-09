@@ -98,7 +98,7 @@ def find_local_tags(verbose: bool=False) -> list:
 def find_remote_tags(verbose: bool=False) -> list:
     """ Return a list of remote tags. """
 
-    cmd = 'git ls-remote --tags origin'
+    cmd = 'git ls-remote --tags --quiet'
 
     if verbose:
         command.display(cmd)
