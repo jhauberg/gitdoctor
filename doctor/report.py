@@ -5,6 +5,7 @@ Provides outputting facilities for reports and diagnosis conclusions.
 """
 
 import sys
+import textwrap
 
 
 def supports_color(stream) -> bool:
@@ -18,7 +19,6 @@ def supports_color(stream) -> bool:
 
 def note(message: str):
     stream = sys.stdout
-
     output = message
 
     if supports_color(stream):
@@ -27,9 +27,8 @@ def note(message: str):
     print(output, file=stream)
 
 
-def conclude(message: str, positive: bool=False):
+def conclude(message: str, supplement: str=None, positive: bool=False):
     stream = sys.stdout
-
     output = f'doctor: {message}'
 
     if supports_color(stream):
@@ -40,8 +39,15 @@ def conclude(message: str, positive: bool=False):
 
     print(output, file=stream)
 
+    if supplement is not None and len(supplement) > 0:
+        inform(supplement)
+
 
 def inform(message: str):
     stream = sys.stderr
+    output = f'{message}'
 
-    print(f'doctor: {message}', file=stream)
+    # wrap output so that it does not exceed 70 columns
+    output = textwrap.fill(output, width=70)
+
+    print(output, file=stream)

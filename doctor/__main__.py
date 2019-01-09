@@ -56,10 +56,13 @@ def main():
         report.conclude('must be inside a work tree')
         sys.exit(1)
 
-    has_integrity = check_integrity(verbose=is_verbose)
+    has_integrity, integrity_errors = check_integrity(verbose=is_verbose)
 
-    if not has_integrity:
-        report.conclude('integrity has been corrupted')
+    if not has_integrity or len(integrity_errors) > 0:
+        for integrity_error in integrity_errors:
+            report.note(integrity_error)
+
+        report.conclude('integrity is corrupted')
         sys.exit(1)
 
     if args['scrub']:
