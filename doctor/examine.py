@@ -76,6 +76,47 @@ def find_unwanted_files(verbose: bool=False) -> list:
     return files
 
 
+def find_local_tags(verbose: bool=False) -> list:
+    """ Return a list of local tags. """
+
+    cmd = 'git tag --list'
+
+    if verbose:
+        command.display(cmd)
+
+    result = subprocess.run(
+        command.get_argv(cmd),
+        check=True,
+        stdout=subprocess.PIPE,
+        stderr=subprocess.DEVNULL)
+
+    tags = result.stdout.decode('utf-8').splitlines()
+
+    return tags
+
+
+def find_remote_tags(verbose: bool=False) -> list:
+    """ Return a list of remote tags. """
+
+    cmd = 'git ls-remote --tags origin'
+
+    if verbose:
+        command.display(cmd)
+
+    result = subprocess.run(
+        command.get_argv(cmd),
+        check=True,
+        stdout=subprocess.PIPE,
+        stderr=subprocess.DEVNULL)
+
+    tags = result.stdout.decode('utf-8').splitlines()
+
+    # assume format like '<commit>    refs/tags/<tag>'
+    tags = [tag.split('/')[-1] for tag in tags]
+
+    return tags
+
+
 def get_exclusion_sources(filepaths: list, verbose: bool) -> list:
     """ Determine which gitignore-rule and file is the source of a file being excluded.
 
@@ -181,6 +222,21 @@ def diagnose(verbose: bool=False):
         conclude(message='missing README',
                  supplement='As per convention, a README-file should exist and be tracked at the '
                             'root of repository.')
+
+    local_tags = find_local_tags(verbose)
+    remote_tags = find_remote_tags(verbose)
+
+    nonsynced_tags = [tag for tag in local_tags if tag not in remote_tags]
+
+    if len(nonsynced_tags) > 0:
+        for tag in nonsynced_tags:
+            note(tag)
+
+        conclude(message='local tags not present on remote',
+                 supplement='These tags should either be deleted using `git tag -d <tag>`, or '
+                            'synced to remote using `git push --tags`. Alternatively, to easily '
+                            'match remote, use `git tag -d $(git tag)` (deleting all local tags), '
+                            'followed by `git fetch --tags` (fetching all remote tags).')
 
     redundant_branches = find_merged_branches(verbose)
 
