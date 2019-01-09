@@ -100,7 +100,9 @@ def get_exclusion_sources(filepaths: list, verbose: bool) -> list:
 
     # the format is <source>:<linenum>:<pattern>\t<pathname>
     # resulting format is <source>:<linenum>
-    return[':'.join(source.split(':')[:2]) for source in sources]
+    formatted_sources = [':'.join(source.split(':')[:2]) for source in sources]
+
+    return formatted_sources
 
 
 def contains_readme(verbose: bool=False) -> bool:
