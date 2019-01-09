@@ -177,10 +177,8 @@ def diagnose(verbose: bool=False):
 
     if not contains_readme(verbose):
         conclude(message='missing README',
-                 supplement='A README-file should be added to the root of the repository. '
-                            'Conventionally, this is the entry point for important information '
-                            'related to a project and is expected to contain critical knowledge '
-                            'such as instructions on use.')
+                 supplement='As per convention, a README-file should exist and be tracked at the '
+                            'root of repository.')
 
     redundant_branches = find_merged_branches(verbose)
 
