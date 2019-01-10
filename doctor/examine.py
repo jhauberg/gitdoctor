@@ -227,10 +227,10 @@ def diagnose(verbose: bool=False):
     local_tags = find_local_tags(verbose)
     remote_tags = find_remote_tags(verbose)
 
-    nonsynced_tags = [tag for tag in local_tags if tag not in remote_tags]
+    missing_tags = [tag for tag in local_tags if tag not in remote_tags]
 
-    if len(nonsynced_tags) > 0:
-        for tag in nonsynced_tags:
+    if len(missing_tags) > 0:
+        for tag in missing_tags:
             note(tag)
 
         conclude(message='local tags not present on remote',
