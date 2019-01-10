@@ -47,7 +47,7 @@ def find_unreachable_objects(verbose) -> list:
 
 
 def find_unwanted_files(verbose: bool=False) -> list:
-    """ Return a list of files that are being tracked but also match a gitignore-rule.
+    """ Return a list of tracked files that match a gitignore-rule.
 
     Check against any viable gitignore location; e.g. any of the following:
         .git/info/exclude
@@ -147,7 +147,7 @@ def get_exclusion_sources(filepaths: list, verbose: bool) -> list:
 
 
 def contains_readme(verbose: bool=False) -> bool:
-    """ Return True if current repository tracks a README file, False otherwise.
+    """ Return True if current repository tracks a README file at root level, False otherwise.
 
     Note that this check only applies to files tracked by the index; return True only if a README-
     file exists on the filesystem and is also under version control.
@@ -246,7 +246,7 @@ def diagnose(verbose: bool=False):
 
         conclude(message='redundant branches; already merged with master',
                  supplement='These branches should be deleted (both locally and remote) unless '
-                            'they are intentionally long-running and will continue to be used.')
+                            'they will continue to be used and are intentionally long-running.')
 
     unwanted_files = find_unwanted_files(verbose)
 
