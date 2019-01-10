@@ -76,6 +76,28 @@ def find_unwanted_files(verbose: bool=False) -> list:
     return files
 
 
+def find_excluded_files(verbose: bool=False) -> list:
+    """ Return a list of both tracked and untracked files that match a gitignore-rule. """
+
+    cmd = 'git ls-files --others --ignored --exclude-standard'
+
+    if verbose:
+        command.display(cmd)
+
+    root_path = repo.absolute_path()
+
+    result = subprocess.run(
+        command.get_argv(cmd),
+        cwd=root_path,
+        check=True,
+        stdout=subprocess.PIPE,
+        stderr=subprocess.DEVNULL)
+
+    files = result.stdout.decode('utf-8').splitlines()
+
+    return files
+
+
 def is_file_tracked(filepath: str, verbose: bool=False) -> bool:
     """ Return True if file is tracked in current repository, False otherwise. """
 
