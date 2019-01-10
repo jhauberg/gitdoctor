@@ -161,6 +161,22 @@ def get_exclusion_sources(filepaths: list, verbose: bool) -> list:
     Return a list that is synchronous and identical in length to the provided filepaths.
     """
 
+    # to avoid exceeding max argument/commandline length, we split input into chunks if necessary
+    # the chunk size is completely arbitrary, but larger is better (fewer git executions)
+    chunk_size = 1024
+
+    if len(filepaths) > chunk_size:
+        chunks = [filepaths[i:i + chunk_size] for i in range(0, len(filepaths), chunk_size)]
+
+        sources = []
+
+        for chunk in chunks:
+            sources.extend(get_exclusion_sources(chunk, verbose))
+            # disable verbosity after first execution
+            verbose = False
+
+        return sources
+
     cmd = 'git check-ignore --no-index --verbose ...'
 
     if verbose:
