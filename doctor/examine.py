@@ -189,6 +189,7 @@ def find_merged_branches(verbose: bool) -> list:
 
     result = subprocess.run(
         command.get_argv(cmd),
+        check=True,
         stdout=subprocess.PIPE,
         stderr=subprocess.DEVNULL)
 
@@ -256,8 +257,10 @@ def diagnose(verbose: bool=False):
         if verbose:
             sources = get_exclusion_sources(unwanted_files, verbose)
 
+            assert len(sources) == len(unwanted_files)
+
         for i, file in enumerate(unwanted_files):
-            if verbose and len(sources) > 0:
+            if verbose:
                 source = sources[i]
                 file = f'{file} ({source})'
 
