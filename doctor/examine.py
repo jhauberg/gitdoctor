@@ -230,7 +230,7 @@ def contains_readme(verbose: bool=False) -> bool:
     return len(files) > 0
 
 
-def find_merged_branches(verbose: bool) -> list:
+def find_merged_branches(verbose: bool) -> (list, str):
     """ Return a list of branches (local and remote) that are already merged with master. """
 
     default_branch_ref = repo.default_branch()
@@ -258,7 +258,7 @@ def find_merged_branches(verbose: bool) -> list:
                 if not branch.endswith(default_branch_ref) and
                 not branch == default_branch_name]
 
-    return branches
+    return branches, default_branch_name
 
 
 def diagnose(verbose: bool=False):
@@ -293,13 +293,13 @@ def diagnose(verbose: bool=False):
                             'match remote, use `git tag -d $(git tag)` (deleting all local tags), '
                             'followed by `git fetch --tags` (fetching all remote tags).')
 
-    redundant_branches = find_merged_branches(verbose)
+    redundant_branches, default_branch = find_merged_branches(verbose)
 
     if len(redundant_branches) > 0:
         for branch in redundant_branches:
             note(branch)
 
-        conclude(message='redundant branches; already merged with master',
+        conclude(message=f'redundant branches; already merged with \'{default_branch}\'',
                  supplement='These branches should be deleted (both locally and remote) unless '
                             'they will continue to be used and are intentionally long-running.')
 
