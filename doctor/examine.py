@@ -303,6 +303,40 @@ def diagnose(verbose: bool=False):
                  supplement='These branches should be deleted (both locally and remote) unless '
                             'they will continue to be used and are intentionally long-running.')
 
+    excluded_files = find_excluded_files(verbose)
+
+    if len(excluded_files) > 0:
+        sources = get_exclusion_sources(excluded_files, verbose)
+
+        assert len(sources) == len(excluded_files)
+
+        source_filepaths = [source.split(':')[0] for source in sources]
+
+        tracked_source_filepaths = [source for source in set(source_filepaths)
+                                    if is_file_tracked(source, verbose)]
+
+        has_untracked_rules = False
+
+        for i, file in enumerate(excluded_files):
+            source = sources[i]
+            source_filepath = source_filepaths[i]
+
+            if source_filepath in tracked_source_filepaths:
+                # skip this exclusion
+                continue
+
+            has_untracked_rules = True
+
+            file = f'{file} ({source})'
+
+            note(file)
+
+        if has_untracked_rules:
+            conclude(message='files are being excluded by untracked rules',
+                     supplement='Consider whether any of these files should also be excluded by '
+                                'other contributors; if so, adding any applicable rules to a '
+                                'tracked .gitignore file would be preferable.')
+
     unwanted_files = find_unwanted_files(verbose)
 
     if len(unwanted_files) > 0:
