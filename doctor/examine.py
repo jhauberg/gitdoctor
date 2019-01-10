@@ -76,6 +76,22 @@ def find_unwanted_files(verbose: bool=False) -> list:
     return files
 
 
+def is_file_tracked(filepath: str, verbose: bool=False) -> bool:
+    """ Return True if file is tracked in current repository, False otherwise. """
+
+    cmd = f'git ls-files --error-unmatch {filepath}'
+
+    if verbose:
+        command.display(cmd)
+
+    result = subprocess.run(
+        command.get_argv(cmd),
+        stdout=subprocess.DEVNULL,
+        stderr=subprocess.DEVNULL)
+
+    return result.returncode == 0
+
+
 def find_local_tags(verbose: bool=False) -> list:
     """ Return a list of local tags. """
 
