@@ -47,7 +47,7 @@ def find_unreachable_objects(verbose) -> list:
 
 
 def find_unwanted_files(verbose: bool=False) -> list:
-    """ Return a list of files that are being tracked but also match a gitignore-rule.
+    """ Return a list of tracked files that match a gitignore-rule.
 
     Check against any viable gitignore location; e.g. any of the following:
         .git/info/exclude
@@ -76,6 +76,44 @@ def find_unwanted_files(verbose: bool=False) -> list:
     return files
 
 
+def find_excluded_files(verbose: bool=False) -> list:
+    """ Return a list of both tracked and untracked files that match a gitignore-rule. """
+
+    cmd = 'git ls-files --others --ignored --exclude-standard'
+
+    if verbose:
+        command.display(cmd)
+
+    root_path = repo.absolute_path()
+
+    result = subprocess.run(
+        command.get_argv(cmd),
+        cwd=root_path,
+        check=True,
+        stdout=subprocess.PIPE,
+        stderr=subprocess.DEVNULL)
+
+    files = result.stdout.decode('utf-8').splitlines()
+
+    return files
+
+
+def is_file_tracked(filepath: str, verbose: bool=False) -> bool:
+    """ Return True if file is tracked in current repository, False otherwise. """
+
+    cmd = f'git ls-files --error-unmatch {filepath}'
+
+    if verbose:
+        command.display(cmd)
+
+    result = subprocess.run(
+        command.get_argv(cmd),
+        stdout=subprocess.DEVNULL,
+        stderr=subprocess.DEVNULL)
+
+    return result.returncode == 0
+
+
 def find_local_tags(verbose: bool=False) -> list:
     """ Return a list of local tags. """
 
@@ -98,7 +136,7 @@ def find_local_tags(verbose: bool=False) -> list:
 def find_remote_tags(verbose: bool=False) -> list:
     """ Return a list of remote tags. """
 
-    cmd = 'git ls-remote --tags origin'
+    cmd = 'git ls-remote --tags --quiet'
 
     if verbose:
         command.display(cmd)
@@ -122,6 +160,22 @@ def get_exclusion_sources(filepaths: list, verbose: bool) -> list:
 
     Return a list that is synchronous and identical in length to the provided filepaths.
     """
+
+    # to avoid exceeding max argument/commandline length, we split input into chunks if necessary
+    # the chunk size is completely arbitrary, but larger is better (fewer git executions)
+    chunk_size = 1024
+
+    if len(filepaths) > chunk_size:
+        chunks = [filepaths[i:i + chunk_size] for i in range(0, len(filepaths), chunk_size)]
+
+        sources = []
+
+        for chunk in chunks:
+            sources.extend(get_exclusion_sources(chunk, verbose))
+            # disable verbosity after first execution
+            verbose = False
+
+        return sources
 
     cmd = 'git check-ignore --no-index --verbose ...'
 
@@ -147,7 +201,7 @@ def get_exclusion_sources(filepaths: list, verbose: bool) -> list:
 
 
 def contains_readme(verbose: bool=False) -> bool:
-    """ Return True if current repository tracks a README file, False otherwise.
+    """ Return True if current repository tracks a README file at root level, False otherwise.
 
     Note that this check only applies to files tracked by the index; return True only if a README-
     file exists on the filesystem and is also under version control.
@@ -176,19 +230,20 @@ def contains_readme(verbose: bool=False) -> bool:
     return len(files) > 0
 
 
-def find_merged_branches(verbose: bool) -> list:
+def find_merged_branches(verbose: bool) -> (list, str):
     """ Return a list of branches (local and remote) that are already merged with master. """
 
     default_branch_ref = repo.default_branch()
     default_branch_name = default_branch_ref.split('/')[-1]
 
-    cmd = f'git branch -all --merged {default_branch_name}'
+    cmd = f'git branch --all --merged {default_branch_name}'
 
     if verbose:
         command.display(cmd)
 
     result = subprocess.run(
         command.get_argv(cmd),
+        check=True,
         stdout=subprocess.PIPE,
         stderr=subprocess.DEVNULL)
 
@@ -203,7 +258,7 @@ def find_merged_branches(verbose: bool) -> list:
                 if not branch.endswith(default_branch_ref) and
                 not branch == default_branch_name]
 
-    return branches
+    return branches, default_branch_name
 
 
 def diagnose(verbose: bool=False):
@@ -226,10 +281,10 @@ def diagnose(verbose: bool=False):
     local_tags = find_local_tags(verbose)
     remote_tags = find_remote_tags(verbose)
 
-    nonsynced_tags = [tag for tag in local_tags if tag not in remote_tags]
+    missing_tags = [tag for tag in local_tags if tag not in remote_tags]
 
-    if len(nonsynced_tags) > 0:
-        for tag in nonsynced_tags:
+    if len(missing_tags) > 0:
+        for tag in missing_tags:
             note(tag)
 
         conclude(message='local tags not present on remote',
@@ -238,15 +293,49 @@ def diagnose(verbose: bool=False):
                             'match remote, use `git tag -d $(git tag)` (deleting all local tags), '
                             'followed by `git fetch --tags` (fetching all remote tags).')
 
-    redundant_branches = find_merged_branches(verbose)
+    redundant_branches, default_branch = find_merged_branches(verbose)
 
     if len(redundant_branches) > 0:
         for branch in redundant_branches:
             note(branch)
 
-        conclude(message='redundant branches; already merged with master',
+        conclude(message=f'redundant branches; already merged with \'{default_branch}\'',
                  supplement='These branches should be deleted (both locally and remote) unless '
-                            'they are intentionally long-running and will continue to be used.')
+                            'they will continue to be used and are intentionally long-running.')
+
+    excluded_files = find_excluded_files(verbose)
+
+    if len(excluded_files) > 0:
+        sources = get_exclusion_sources(excluded_files, verbose)
+
+        assert len(sources) == len(excluded_files)
+
+        source_filepaths = [source.split(':')[0] for source in sources]
+
+        tracked_source_filepaths = [source for source in set(source_filepaths)
+                                    if is_file_tracked(source, verbose)]
+
+        has_untracked_rules = False
+
+        for i, file in enumerate(excluded_files):
+            source = sources[i]
+            source_filepath = source_filepaths[i]
+
+            if source_filepath in tracked_source_filepaths:
+                # skip this exclusion
+                continue
+
+            has_untracked_rules = True
+
+            file = f'{file} ({source})'
+
+            note(file)
+
+        if has_untracked_rules:
+            conclude(message='files are being excluded by untracked rules',
+                     supplement='Consider whether any of these files should also be excluded by '
+                                'other contributors; if so, adding any applicable rules to a '
+                                'tracked .gitignore file would be preferable.')
 
     unwanted_files = find_unwanted_files(verbose)
 
@@ -256,8 +345,10 @@ def diagnose(verbose: bool=False):
         if verbose:
             sources = get_exclusion_sources(unwanted_files, verbose)
 
+            assert len(sources) == len(unwanted_files)
+
         for i, file in enumerate(unwanted_files):
-            if verbose and len(sources) > 0:
+            if verbose:
                 source = sources[i]
                 file = f'{file} ({source})'
 

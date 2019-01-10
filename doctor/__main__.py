@@ -62,7 +62,7 @@ def main():
         for integrity_error in integrity_errors:
             report.note(integrity_error)
 
-        report.conclude('integrity is corrupted')
+        report.conclude('integrity is corrupted; won\'t proceed')
         sys.exit(1)
 
     if args['scrub']:
