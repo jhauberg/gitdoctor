@@ -28,6 +28,20 @@ import doctor.repo as repo
 import doctor.report as report
 
 
+def pretty_size(size_in_bytes: int) -> str:
+    """ Return a size (in bytes) as a prettified string. """
+
+    size_variants = ('B', 'KB', 'MB')
+    size_index = int(math.floor(math.log(abs(size_in_bytes), 1024)))
+    size = round(abs(size_in_bytes) / math.pow(1024, size_index), 2)
+
+    size_type = size_variants[size_index]
+
+    precision = 2 if size_index > 1 else 0
+
+    return f'{size:.{precision}f}{size_type}'
+
+
 def main():
     """ Entry point for invoking the git-doctor cli. """
 
@@ -68,20 +82,10 @@ def main():
     if args['scrub']:
         size_difference = trim(aggressively=args['--full'], verbose=is_verbose)
 
-        if size_difference != 0:
-            shrunk = size_difference < 0
+        if size_difference < 0:
+            size = pretty_size(size_difference)
 
-            size_variants = ('B', 'KB', 'MB')
-            size_index = int(math.floor(math.log(abs(size_difference), 1024)))
-            size = round(abs(size_difference) / math.pow(1024, size_index), 2)
-
-            size_type = size_variants[size_index]
-
-            precision = 2 if size_index > 1 else 0
-            result = f'{size:.{precision}f}{size_type}'
-
-            if shrunk:
-                report.conclude(f'restored approximately {result} of disk space', positive=True)
+            report.conclude(f'restored approximately {size} of disk space', positive=True)
     else:
         diagnose(verbose=is_verbose)
 
