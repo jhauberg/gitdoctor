@@ -3,7 +3,7 @@
 
 """
 usage: git doctor [--verbose]
-       git doctor scrub [--full] [--verbose]
+       git doctor scrub [--verbose] [--full]
 
 OPTIONS
   -f --full     Run a full scrubdown (might take a while)
