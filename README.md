@@ -1,6 +1,6 @@
 # git-doctor
 
-A [git extension](https://git-scm.com) that helps diagnosing your repository for common defects.
+A [git](https://git-scm.com) [extension](https://www.atlassian.com/git/articles/extending-git) that helps diagnosing your repository for common defects.
 
 ## Installation
 
@@ -31,7 +31,7 @@ This initiates an [examination](#examination) of the git repository found in the
 
 ```console
 usage: git doctor [--verbose]
-       git doctor scrub [--full] [--verbose]
+       git doctor scrub [--verbose] [--full]
 
 OPTIONS
   -f --full     Run a full scrubdown (might take a while)
