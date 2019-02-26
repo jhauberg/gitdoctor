@@ -31,10 +31,10 @@ This initiates an [examination](#examination) of the git repository found in the
 
 ```console
 usage: git doctor [--verbose]
-       git doctor scrub [--verbose] [--full]
+       git doctor scrub [--verbose] [--aggressive]
 
 OPTIONS
-  -f --full     Run a full scrubdown (might take a while)
+  --aggressive  Run a full scrubdown (might take a while)
   -v --verbose  Show diagnostic messages
   -h --help     Show program help
   --version     Show program version
