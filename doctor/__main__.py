@@ -67,9 +67,13 @@ def main():
     is_verbose = args['--verbose']
 
     if not repo.exists():
+        # note that this also reports False when inside the .git folder of a repository
         report.conclude('must be inside a work tree')
         sys.exit(1)
 
+    # determine whether repo seems to be alright and working as expected
+    # if the repo has bad files, files in odd places or similar, then we can't be sure
+    # that git commands will work or produce the expected results; so bail out if that is the case
     has_integrity, integrity_errors = check_integrity(verbose=is_verbose)
 
     if not has_integrity or len(integrity_errors) > 0:

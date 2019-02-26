@@ -11,6 +11,9 @@ import subprocess
 def can_be_examined() -> bool:
     """ Return True if git is installed. """
 
+    # assume that if a simple git invocation fails, then git is probably not installed
+    # this is a portable way to determine existence of a binary on PATH, versus using
+    # platform-specific tools like `which` on macOS or (sometimes) `where` on Windows
     try:
         result = subprocess.run([
             'git', '--version'],
