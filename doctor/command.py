@@ -7,30 +7,30 @@ Provides a common interface for executing commands.
 import sys
 import subprocess
 
+import doctor.report as report
+
 from doctor.report import supports_color
 
 
 def get_argv(cmd: str) -> list:
-    """ Return a list of arguments from a full command. """
+    """ Return a list of arguments from a fully-formed command line. """
 
     return cmd.strip().split(' ')
 
 
 def display(cmd: str):
-    """ Emit a diagnostic message of a command line. """
-
-    stream = sys.stderr
+    """ Emit a diagnostic message that looks like the execution of a command line. """
 
     diagnostic = f'$ {cmd}'
-    diagnostic = f'\x1b[0;37m{diagnostic}\x1b[0m' if supports_color(stream) else diagnostic
+    diagnostic = f'\x1b[0;37m{diagnostic}\x1b[0m' if supports_color(sys.stderr) else diagnostic
 
-    print(diagnostic, file=stream)
+    report.information(diagnostic, wrapped=False)
 
 
 def execute(cmd: str, show_argv: bool=False, show_output: bool=False) -> int:
     """ Execute a command-line process and return exit code.
 
-    If show_argv is True, display the executed command and its parameters/arguments.
+    If show_argv is True, display the executed command with parameters/arguments.
     If show_output is True, display the resulting output from the executed command.
 
     The resulting output of the executed command is not redirected (unless show_output is False,
