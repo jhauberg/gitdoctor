@@ -14,6 +14,8 @@ This will put an executable `git-doctor` binary onto your `PATH`, making `git` a
 
 ### Requirements
 
+###### Git versions before 2.17 might not be supported
+
 - Python 3.6+
 - [docopt](https://github.com/docopt/docopt)
 
