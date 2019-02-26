@@ -41,17 +41,18 @@ def important(message: str, positive: bool=False):
     print(output, file=stream)
 
 
-def information(message: str):
+def information(message: str, wrapped: bool=True):
     """ Emit an informative diagnostic message.
 
     Informative diagnostics go to stderr and must not be a vital resulting output.
     """
 
     stream = sys.stderr
-    output = f'{message}'
+    output = message
 
-    # wrap output so that it does not exceed 70 columns
-    output = textwrap.fill(output, width=70)
+    if wrapped:
+        # wrap output so that it does not exceed 70 columns
+        output = textwrap.fill(output, width=70)
 
     print(output, file=stream)
 
