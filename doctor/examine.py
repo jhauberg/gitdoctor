@@ -235,13 +235,12 @@ def contains_readme(verbose: bool=False) -> bool:
     return len(files) > 0
 
 
-def find_merged_branches(verbose: bool) -> (list, str):
-    """ Return a list of branches (local and remote) that are already merged with master. """
+def find_merged_branches(remote: str, verbose: bool) -> (list, str):
+    """ Return a list of branches that are merged with default branch on a remote. """
 
-    default_branch_ref = repo.default_branch()
-    default_branch_name = default_branch_ref.split('/')[-1]
+    default_branch = repo.default_branch(remote)
 
-    cmd = f'git branch --all --merged {default_branch_name}'
+    cmd = f'git branch --all --merged {default_branch}'
 
     if verbose:
         command.display(cmd)
@@ -260,10 +259,10 @@ def find_merged_branches(verbose: bool) -> (list, str):
     branches = [branch[2:] if branch.startswith('*') else branch for branch in branches]
     # remove default branch references
     branches = [branch for branch in branches
-                if not branch.endswith(default_branch_ref) and
-                not branch == default_branch_name]
+                if not branch.endswith(default_branch) and
+                not branch == default_branch]
 
-    return branches, default_branch_name
+    return branches, default_branch
 
 
 def diagnose(verbose: bool=False):
@@ -283,7 +282,9 @@ def diagnose(verbose: bool=False):
                  supplement='As per convention, a README-file should exist and be tracked at the '
                             'root of the repository.')
 
-    if repo.has_remote():
+    has_remote, remote = repo.has_remote()
+
+    if has_remote:
         local_tags = find_local_tags(verbose)
         remote_tags = find_remote_tags(verbose)
 
@@ -301,15 +302,16 @@ def diagnose(verbose: bool=False):
                                 'local tags), followed by `git fetch --tags` (fetching all remote '
                                 'tags).')
 
-    redundant_branches, default_branch = find_merged_branches(verbose)
+    if has_remote:
+        redundant_branches, default_branch = find_merged_branches(remote, verbose)
 
-    if len(redundant_branches) > 0:
-        for branch in redundant_branches:
-            note(branch)
+        if len(redundant_branches) > 0:
+            for branch in redundant_branches:
+                note(branch)
 
-        conclude(message=f'redundant branches; already merged with \'{default_branch}\'',
-                 supplement='These branches should be deleted (both locally and remote) unless '
-                            'they will continue to be used and are intentionally long-running.')
+            conclude(message=f'redundant branches; already merged with \'{default_branch}\'',
+                     supplement='These branches should be deleted (both locally and remote) unless '
+                                'they will continue to be used and are intentionally long-running.')
 
     excluded_files = find_excluded_files(verbose)
 

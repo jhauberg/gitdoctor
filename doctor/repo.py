@@ -5,6 +5,7 @@ Provides utility functions for inspecting the current repository.
 """
 
 import os
+import re
 import subprocess
 
 
@@ -44,16 +45,38 @@ def exists() -> bool:
     return 'true' in status.lower()
 
 
-def default_branch() -> str:
-    """ Return the symbolic reference to the default branch. """
+def has_remote() -> (bool, str):
+    """ Return True if current repository has one or more remotes, False otherwise. """
 
     result = subprocess.run([
-        'git', 'symbolic-ref', '--short', 'refs/remotes/origin/HEAD'],
+        'git', 'remote'],
         check=True,  # print stacktrace on non-zero exit status
         stdout=subprocess.PIPE,  # capture stdout
         stderr=subprocess.DEVNULL)  # ignore stderr
 
-    name = result.stdout.decode('utf-8')
+    remotes = result.stdout.decode('utf-8').splitlines()
+
+    has_remotes = len(remotes) > 0
+
+    return has_remotes, remotes[0] if has_remotes else None
+
+
+def default_branch(remote: str) -> str:
+    """ Return the name of the default branch on a remote. """
+
+    result = subprocess.run([
+        'git', 'remote', 'show', remote],
+        check=True,  # print stacktrace on non-zero exit status
+        stdout=subprocess.PIPE,  # capture stdout
+        stderr=subprocess.DEVNULL)  # ignore stderr
+
+    output = result.stdout.decode('utf-8')
+
+    match = re.search(r'HEAD branch:(.*)', output)
+
+    assert match is not None
+
+    name = match.group(1)
 
     return name.strip()
 
@@ -70,20 +93,6 @@ def absolute_path() -> str:
     path = result.stdout.decode('utf-8')
 
     return path.strip()
-
-
-def has_remote() -> bool:
-    """ Return True if current repository has one or more remotes, False otherwise. """
-
-    result = subprocess.run([
-        'git', 'remote'],
-        check=True,  # print stacktrace on non-zero exit status
-        stdout=subprocess.PIPE,  # capture stdout
-        stderr=subprocess.DEVNULL)  # ignore stderr
-
-    remotes = result.stdout.decode('utf-8').splitlines()
-
-    return len(remotes) > 0
 
 
 def size_in_bytes(exclude_work_tree: bool=False) -> int:
