@@ -21,7 +21,7 @@ from docopt import docopt
 
 from doctor import exit_if_not_compatible, enable_colors, __version__
 
-from doctor.examine import diagnose, check_integrity
+from doctor.examine import diagnose, check_eligibility
 from doctor.scrub import trim
 
 import doctor.repo as repo
@@ -71,19 +71,23 @@ def main():
         report.conclude('must be inside a work tree')
         sys.exit(1)
 
+    scrubdown = args['scrub']
+
     # determine whether repo seems to be alright and working as expected
     # if the repo has bad files, files in odd places or similar, then we can't be sure
     # that git commands will work or produce the expected results; so bail out if that is the case
-    has_integrity, integrity_errors = check_integrity(verbose=is_verbose)
+    is_eligible, issues = check_eligibility(verbose=is_verbose)
 
-    if not has_integrity or len(integrity_errors) > 0:
-        for integrity_error in integrity_errors:
-            report.note(integrity_error)
+    if not is_eligible:
+        for issue in issues:
+            report.note(issue)
 
-        report.conclude('integrity is corrupted; won\'t proceed')
+        examination_or_scrubdown = 'examination' if not scrubdown else 'scrubdown'
+
+        report.conclude(f'repository is not eligible for {examination_or_scrubdown}')
         sys.exit(1)
 
-    if args['scrub']:
+    if scrubdown:
         size_difference = trim(aggressively=args['--aggressive'], verbose=is_verbose)
 
         if size_difference < 0:

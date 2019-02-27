@@ -10,8 +10,11 @@ from doctor import command, repo
 from doctor.report import note, conclude
 
 
-def check_integrity(verbose: bool=False) -> (bool, list):
-    """ Return True if repository has internal consistency, False otherwise. """
+def check_eligibility(verbose: bool=False) -> (bool, list):
+    """ Return True if repository is eligible for examination, False otherwise.
+
+    Determine eligibility by whether or not a `git fsck` check passes and produces no issues.
+    """
 
     cmd = 'git fsck --no-progress --strict --full'
 
@@ -23,9 +26,11 @@ def check_integrity(verbose: bool=False) -> (bool, list):
         stdout=subprocess.DEVNULL,
         stderr=subprocess.PIPE)
 
-    errors = result.stderr.decode('utf-8').splitlines()
+    issues = result.stderr.decode('utf-8').splitlines()
 
-    return result.returncode == 0, errors
+    is_eligible = result.returncode == 0 and len(issues) == 0
+
+    return is_eligible, issues
 
 
 def find_unreachable_objects(verbose) -> list:
