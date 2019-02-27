@@ -54,7 +54,7 @@ Assuming the repository is fit and eligible for examination, `git-doctor` starts
 
 A scrubdown performs the basic git housekeeping commands: [`reflog expire`](https://git-scm.com/docs/git-reflog) followed by [`gc`](https://git-scm.com/docs/git-gc) (with `--aggressive` for a full scrubdown).
 
-Typically, some housekeeping tasks are also run regularly and automatically on your remotes (e.g. [gitlab](https://docs.gitlab.com/ee/administration/housekeeping.html), [bitbucket](https://confluence.atlassian.com/bitbucket/do-i-need-to-run-git-gc-housekeeping-on-my-repo-287998264.html)), but may be beneficial to run manually on occasion.
+Typically, some housekeeping tasks are also run regularly and automatically on your remotes (e.g. [gitlab](https://docs.gitlab.com/ee/administration/housekeeping.html), [bitbucket](https://confluence.atlassian.com/bitbucket/do-i-need-to-run-git-gc-housekeeping-on-my-repo-287998264.html)), but may be beneficial to run manually on local clones occasionally.
 
 ## License
 
