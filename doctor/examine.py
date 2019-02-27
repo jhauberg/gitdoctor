@@ -281,22 +281,25 @@ def diagnose(verbose: bool=False):
     if not contains_readme(verbose):
         conclude(message='missing README',
                  supplement='As per convention, a README-file should exist and be tracked at the '
-                            'root of repository.')
+                            'root of the repository.')
 
-    local_tags = find_local_tags(verbose)
-    remote_tags = find_remote_tags(verbose)
+    if repo.has_remote():
+        local_tags = find_local_tags(verbose)
+        remote_tags = find_remote_tags(verbose)
 
-    missing_tags = [tag for tag in local_tags if tag not in remote_tags]
+        missing_tags = [tag for tag in local_tags
+                        if tag not in remote_tags]
 
-    if len(missing_tags) > 0:
-        for tag in missing_tags:
-            note(tag)
+        if len(missing_tags) > 0:
+            for tag in missing_tags:
+                note(tag)
 
-        conclude(message='local tags not present on remote',
-                 supplement='These tags should either be deleted using `git tag -d <tag>`, or '
-                            'synced to remote using `git push --tags`. Alternatively, to easily '
-                            'match remote, use `git tag -d $(git tag)` (deleting all local tags), '
-                            'followed by `git fetch --tags` (fetching all remote tags).')
+            conclude(message='local tags not present on remote',
+                     supplement='These tags should either be deleted using `git tag -d <tag>`, or '
+                                'synced to remote using `git push --tags`. Alternatively, to '
+                                'easily match remote, use `git tag -d $(git tag)` (deleting all '
+                                'local tags), followed by `git fetch --tags` (fetching all remote '
+                                'tags).')
 
     redundant_branches, default_branch = find_merged_branches(verbose)
 
