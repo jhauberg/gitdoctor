@@ -72,6 +72,20 @@ def absolute_path() -> str:
     return path.strip()
 
 
+def has_remote() -> bool:
+    """ Return True if current repository has one or more remotes, False otherwise. """
+
+    result = subprocess.run([
+        'git', 'remote'],
+        check=True,  # print stacktrace on non-zero exit status
+        stdout=subprocess.PIPE,  # capture stdout
+        stderr=subprocess.DEVNULL)  # ignore stderr
+
+    remotes = result.stdout.decode('utf-8').splitlines()
+
+    return len(remotes) > 0
+
+
 def size_in_bytes(exclude_work_tree: bool=False) -> int:
     """ Return the size (in bytes) of current repository.
 
