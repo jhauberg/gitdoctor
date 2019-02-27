@@ -46,13 +46,15 @@ OPTIONS
 
 The purpose of an examination is to discover and identify defects in a repository.
 
-Assuming the repository is fit and viable for examination, `git-doctor` starts looking for defects and reports any results along the way. This process consists of various standard git commands and checks. **No files are touched during an examination**, and the user must manually take action on any reported defects.
+Assuming the repository is fit and eligible for examination, `git-doctor` starts looking for defects and reports any results along the way. This process consists of various standard git commands and checks. **No files are touched during an examination**, and the user must manually take action on any reported defects.
 
 ## Scrubdown
 
-**Scrubbing a repository will perform modifications to the files/index.**
+**Scrubbing a repository will perform modifications to the index.**
 
-A scrubdown performs the basic git housekeeping commands: [`reflog expire`](https://git-scm.com/docs/git-reflog) followed by [`gc`](https://git-scm.com/docs/git-gc) (with `--aggressive` for a full scrubdown), ~~then proceeds to remove any unwanted files and redundant branches~~.
+A scrubdown performs the basic git housekeeping commands: [`reflog expire`](https://git-scm.com/docs/git-reflog) followed by [`gc`](https://git-scm.com/docs/git-gc) (with `--aggressive` for a full scrubdown).
+
+Typically, some housekeeping tasks are also run regularly and automatically on your remotes (e.g. [gitlab](https://docs.gitlab.com/ee/administration/housekeeping.html), [bitbucket](https://confluence.atlassian.com/bitbucket/do-i-need-to-run-git-gc-housekeeping-on-my-repo-287998264.html)), but may be beneficial to run manually on occasion.
 
 ## License
 
