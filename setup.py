@@ -48,7 +48,7 @@ setup(
     author='Jacob Hauberg Hansen',
     author_email='jacob.hauberg@gmail.com',
     license='MIT',
-    packages=find_packages(exclude=('tests',)),
+    packages=find_packages(),
     include_package_data=True,
     platforms='any',
     install_requires=[
