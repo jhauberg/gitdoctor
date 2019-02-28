@@ -21,7 +21,8 @@ from docopt import docopt
 
 from doctor import exit_if_not_compatible, enable_colors, __version__
 
-from doctor.examine import diagnose, check_eligibility
+from doctor.diagnose import diagnose
+from doctor.examine import check_eligibility
 from doctor.scrub import trim
 
 import doctor.repo as repo

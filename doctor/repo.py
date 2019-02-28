@@ -58,6 +58,7 @@ def has_remote() -> (bool, str):
 
     has_remotes = len(remotes) > 0
 
+    # bias toward first listed remote; this could be wrong
     return has_remotes, remotes[0] if has_remotes else None
 
 
