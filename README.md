@@ -10,9 +10,11 @@ Install `git-doctor` from source:
 $ python setup.py install
 ```
 
-This will put an executable `git-doctor` binary onto your `PATH`, making `git` able to interact with it.
+This will put an executable `git-doctor` binary onto your `PATH`, making `git` able to [interact](https://www.atlassian.com/git/articles/extending-git) with it.
 
 ### Requirements
+
+###### Git versions before 2.17 might not be supported
 
 - Python 3.6+
 - [docopt](https://github.com/docopt/docopt)
@@ -31,10 +33,10 @@ This initiates an [examination](#examination) of the git repository found in the
 
 ```console
 usage: git doctor [--verbose]
-       git doctor scrub [--full] [--verbose]
+       git doctor scrub [--verbose] [--aggressive]
 
 OPTIONS
-  -f --full     Run a full scrubdown (might take a while)
+  --aggressive  Run a full scrubdown (might take a while)
   -v --verbose  Show diagnostic messages
   -h --help     Show program help
   --version     Show program version
@@ -44,13 +46,19 @@ OPTIONS
 
 The purpose of an examination is to discover and identify defects in a repository.
 
-Assuming the repository is fit and viable for examination, `git-doctor` starts looking for defects and reports any results along the way. This process consists of various standard git commands and checks. **No files are touched during an examination**, and the user must manually take action on any reported defects.
+Assuming the repository is eligible for examination, `git-doctor` starts looking for defects and reports any results along the way. This process consists of various standard git commands and checks.
+
+**No files are touched during an examination**, and the user must manually take action on any reported defects.
 
 ## Scrubdown
 
-**Scrubbing a repository will perform modifications to the files/index.**
+**Scrubbing a repository will perform modifications to your local repository.**
 
-A scrubdown performs the basic git housekeeping commands: [`reflog expire`](https://git-scm.com/docs/git-reflog) followed by [`gc`](https://git-scm.com/docs/git-gc) (with `--aggressive` for a full scrubdown), ~~then proceeds to remove any unwanted files and redundant branches~~.
+A scrubdown performs the basic git housekeeping commands: [`reflog expire`](https://git-scm.com/docs/git-reflog) followed by [`gc`](https://git-scm.com/docs/git-gc) (with `--aggressive` for a full scrubdown). These commands do not affect any remote repository.
+
+This process will clear your reflog and get rid of any unreachable objects (reflog entries are systematically pruned over time, but a scrubdown clears it completely- *this is important to note, as it may make it difficult to undo recent changes*).
+
+Typically, some housekeeping tasks are also run regularly and automatically on your remotely hosted repositories (e.g. [gitlab](https://docs.gitlab.com/ee/administration/housekeeping.html), [bitbucket](https://confluence.atlassian.com/bitbucket/do-i-need-to-run-git-gc-housekeeping-on-my-repo-287998264.html)), but may be beneficial to run manually on your local clones every now and then.
 
 ## License
 

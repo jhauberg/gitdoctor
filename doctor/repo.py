@@ -5,12 +5,16 @@ Provides utility functions for inspecting the current repository.
 """
 
 import os
+import re
 import subprocess
 
 
 def can_be_examined() -> bool:
     """ Return True if git is installed. """
 
+    # assume that if a simple git invocation fails, then git is probably not installed
+    # this is a portable way to determine existence of a binary on PATH, versus using
+    # platform-specific tools like `which` on macOS or (sometimes) `where` on Windows
     try:
         result = subprocess.run([
             'git', '--version'],
@@ -41,16 +45,39 @@ def exists() -> bool:
     return 'true' in status.lower()
 
 
-def default_branch() -> str:
-    """ Return the symbolic reference to the default branch. """
+def has_remote() -> (bool, str):
+    """ Return True if current repository has one or more remotes, False otherwise. """
 
     result = subprocess.run([
-        'git', 'symbolic-ref', '--short', 'refs/remotes/origin/HEAD'],
+        'git', 'remote'],
         check=True,  # print stacktrace on non-zero exit status
         stdout=subprocess.PIPE,  # capture stdout
         stderr=subprocess.DEVNULL)  # ignore stderr
 
-    name = result.stdout.decode('utf-8')
+    remotes = result.stdout.decode('utf-8').splitlines()
+
+    has_remotes = len(remotes) > 0
+
+    # bias toward first listed remote; this could be wrong
+    return has_remotes, remotes[0] if has_remotes else None
+
+
+def default_branch(remote: str) -> str:
+    """ Return the name of the default branch on a remote. """
+
+    result = subprocess.run([
+        'git', 'remote', 'show', remote],
+        check=True,  # print stacktrace on non-zero exit status
+        stdout=subprocess.PIPE,  # capture stdout
+        stderr=subprocess.DEVNULL)  # ignore stderr
+
+    output = result.stdout.decode('utf-8')
+
+    match = re.search(r'HEAD branch:(.*)', output)
+
+    assert match is not None
+
+    name = match.group(1)
 
     return name.strip()
 

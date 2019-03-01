@@ -1,17 +1,19 @@
 # coding=utf-8
 
 """
-Provides functions for examining and diagnosing defects in the current repository.
+Provides functions for examining and discovering defects in the current repository.
 """
 
 import subprocess
 
 from doctor import command, repo
-from doctor.report import note, conclude
 
 
-def check_integrity(verbose: bool=False) -> (bool, list):
-    """ Return True if repository has internal consistency, False otherwise. """
+def check_eligibility(verbose: bool=False) -> (bool, list):
+    """ Return True if repository is eligible for examination, False otherwise.
+
+    Determine eligibility by whether or not a `git fsck` check passes and produces no issues.
+    """
 
     cmd = 'git fsck --no-progress --strict --full'
 
@@ -23,9 +25,11 @@ def check_integrity(verbose: bool=False) -> (bool, list):
         stdout=subprocess.DEVNULL,
         stderr=subprocess.PIPE)
 
-    errors = result.stderr.decode('utf-8').splitlines()
+    issues = result.stderr.decode('utf-8').splitlines()
 
-    return result.returncode == 0, errors
+    is_eligible = result.returncode == 0 and len(issues) == 0
+
+    return is_eligible, issues
 
 
 def find_unreachable_objects(verbose) -> list:
@@ -230,13 +234,12 @@ def contains_readme(verbose: bool=False) -> bool:
     return len(files) > 0
 
 
-def find_merged_branches(verbose: bool) -> (list, str):
-    """ Return a list of branches (local and remote) that are already merged with master. """
+def find_merged_branches(remote: str, verbose: bool) -> (list, str):
+    """ Return a list of branches that are merged with default branch on a remote. """
 
-    default_branch_ref = repo.default_branch()
-    default_branch_name = default_branch_ref.split('/')[-1]
+    default_branch = repo.default_branch(remote)
 
-    cmd = f'git branch --all --merged {default_branch_name}'
+    cmd = f'git branch --all --merged {default_branch}'
 
     if verbose:
         command.display(cmd)
@@ -255,106 +258,7 @@ def find_merged_branches(verbose: bool) -> (list, str):
     branches = [branch[2:] if branch.startswith('*') else branch for branch in branches]
     # remove default branch references
     branches = [branch for branch in branches
-                if not branch.endswith(default_branch_ref) and
-                not branch == default_branch_name]
+                if not branch.endswith(default_branch) and
+                not branch == default_branch]
 
-    return branches, default_branch_name
-
-
-def diagnose(verbose: bool=False):
-    """ Run all diagnostic checks on current repository. """
-
-    unreachables = find_unreachable_objects(verbose)
-
-    if len(unreachables) > 0:
-        for unreachable in unreachables:
-            note(unreachable)
-
-        conclude(message='scrubdown is recommended',
-                 supplement='Run a scrubdown using `git doctor scrub`.')
-
-    if not contains_readme(verbose):
-        conclude(message='missing README',
-                 supplement='As per convention, a README-file should exist and be tracked at the '
-                            'root of repository.')
-
-    local_tags = find_local_tags(verbose)
-    remote_tags = find_remote_tags(verbose)
-
-    missing_tags = [tag for tag in local_tags if tag not in remote_tags]
-
-    if len(missing_tags) > 0:
-        for tag in missing_tags:
-            note(tag)
-
-        conclude(message='local tags not present on remote',
-                 supplement='These tags should either be deleted using `git tag -d <tag>`, or '
-                            'synced to remote using `git push --tags`. Alternatively, to easily '
-                            'match remote, use `git tag -d $(git tag)` (deleting all local tags), '
-                            'followed by `git fetch --tags` (fetching all remote tags).')
-
-    redundant_branches, default_branch = find_merged_branches(verbose)
-
-    if len(redundant_branches) > 0:
-        for branch in redundant_branches:
-            note(branch)
-
-        conclude(message=f'redundant branches; already merged with \'{default_branch}\'',
-                 supplement='These branches should be deleted (both locally and remote) unless '
-                            'they will continue to be used and are intentionally long-running.')
-
-    excluded_files = find_excluded_files(verbose)
-
-    if len(excluded_files) > 0:
-        sources = get_exclusion_sources(excluded_files, verbose)
-
-        assert len(sources) == len(excluded_files)
-
-        source_filepaths = [source.split(':')[0] for source in sources]
-
-        tracked_source_filepaths = [source for source in set(source_filepaths)
-                                    if is_file_tracked(source, verbose)]
-
-        has_untracked_rules = False
-
-        for i, file in enumerate(excluded_files):
-            source = sources[i]
-            source_filepath = source_filepaths[i]
-
-            if source_filepath in tracked_source_filepaths:
-                # skip this exclusion
-                continue
-
-            has_untracked_rules = True
-
-            file = f'{file} ({source})'
-
-            note(file)
-
-        if has_untracked_rules:
-            conclude(message='files are being excluded by untracked rules',
-                     supplement='Consider whether any of these files should also be excluded by '
-                                'other contributors; if so, adding any applicable rules to a '
-                                'tracked .gitignore file would be preferable.')
-
-    unwanted_files = find_unwanted_files(verbose)
-
-    if len(unwanted_files) > 0:
-        sources = []
-
-        if verbose:
-            sources = get_exclusion_sources(unwanted_files, verbose)
-
-            assert len(sources) == len(unwanted_files)
-
-        for i, file in enumerate(unwanted_files):
-            if verbose:
-                source = sources[i]
-                file = f'{file} ({source})'
-
-            note(file)
-
-        conclude(message='unwanted files are being tracked',
-                 supplement='Remove unwanted files from being tracked using '
-                            '`git remove --cached <filename>`, or remove them completely (from the '
-                            'filesystem) using `git rm <filename>`.')
+    return branches, default_branch

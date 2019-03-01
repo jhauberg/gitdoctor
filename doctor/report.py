@@ -17,17 +17,18 @@ def supports_color(stream) -> bool:
     return stream.isatty() and hasattr(stream, 'isatty')
 
 
-def note(message: str):
-    stream = sys.stdout
-    output = message
+def important(message: str, positive: bool=False):
+    """ Emit an important diagnostic message.
 
-    if supports_color(stream):
-        output = f'\x1b[0;33m{output}\x1b[0m'
+    Important diagnostics go to stdout and are considered as a result output; i.e. output
+    that is directly related to the main purpose of the program.
 
-    print(output, file=stream)
+    If positive is True, coloring of the message (if supported) changes to match sentiment;
+    i.e. positive (blue) instead of negative (red).
 
+    If a supplementary message is provided, emit it as an informative diagnostic.
+    """
 
-def conclude(message: str, supplement: str=None, positive: bool=False):
     stream = sys.stdout
     output = f'doctor: {message}'
 
@@ -39,15 +40,48 @@ def conclude(message: str, supplement: str=None, positive: bool=False):
 
     print(output, file=stream)
 
-    if supplement is not None and len(supplement) > 0:
-        inform(supplement)
 
+def information(message: str, wrapped: bool=True):
+    """ Emit an informative diagnostic message.
 
-def inform(message: str):
+    Informative diagnostics go to stderr and must not be a vital resulting output.
+    """
+
     stream = sys.stderr
-    output = f'{message}'
+    output = message
 
-    # wrap output so that it does not exceed 70 columns
-    output = textwrap.fill(output, width=70)
+    if wrapped:
+        # wrap output so that it does not exceed 70 columns
+        output = textwrap.fill(output, width=70)
 
     print(output, file=stream)
+
+
+def note(message: str):
+    """ Emit a diagnostic message related to an important diagnostic.
+
+    The message is colored yellow (if supported).
+    """
+
+    stream = sys.stdout
+    output = message
+
+    if supports_color(stream):
+        output = f'\x1b[0;33m{output}\x1b[0m'
+
+    print(output, file=stream)
+
+
+def conclude(message: str, supplement: str=None, positive: bool=False):
+    """ Emit an important diagnostic message as the result of a diagnosis.
+
+    If positive is True, coloring of the message (if supported) changes to match sentiment;
+    i.e. positive (blue) instead of negative (red).
+
+    If a supplementary message is provided, emit it as an informative diagnostic.
+    """
+
+    important(message, positive)
+
+    if supplement is not None and len(supplement) > 0:
+        information(supplement)
