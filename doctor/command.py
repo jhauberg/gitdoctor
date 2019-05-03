@@ -27,7 +27,7 @@ def display(cmd: str):
     report.information(diagnostic, wrapped=False)
 
 
-def execute(cmd: str, show_argv: bool=False, show_output: bool=False) -> int:
+def execute(cmd: str, show_argv: bool = False, show_output: bool = False) -> int:
     """ Execute a command-line process and return exit code.
 
     If show_argv is True, display the executed command with parameters/arguments.

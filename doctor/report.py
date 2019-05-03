@@ -17,7 +17,7 @@ def supports_color(stream) -> bool:
     return stream.isatty() and hasattr(stream, 'isatty')
 
 
-def important(message: str, positive: bool=False):
+def important(message: str, positive: bool = False):
     """ Emit an important diagnostic message.
 
     Important diagnostics go to stdout and are considered as a result output; i.e. output
@@ -41,7 +41,7 @@ def important(message: str, positive: bool=False):
     print(output, file=stream)
 
 
-def information(message: str, wrapped: bool=True):
+def information(message: str, wrapped: bool = True):
     """ Emit an informative diagnostic message.
 
     Informative diagnostics go to stderr and must not be a vital resulting output.
@@ -72,7 +72,7 @@ def note(message: str):
     print(output, file=stream)
 
 
-def conclude(message: str, supplement: str=None, positive: bool=False):
+def conclude(message: str, supplement: str = None, positive: bool = False):
     """ Emit an important diagnostic message as the result of a diagnosis.
 
     If positive is True, coloring of the message (if supported) changes to match sentiment;

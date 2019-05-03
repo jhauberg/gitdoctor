@@ -96,7 +96,7 @@ def absolute_path() -> str:
     return path.strip()
 
 
-def size_in_bytes(exclude_work_tree: bool=False) -> int:
+def size_in_bytes(exclude_work_tree: bool = False) -> int:
     """ Return the size (in bytes) of current repository.
 
     If exclude_work_tree is True, only count size of the .git directory.

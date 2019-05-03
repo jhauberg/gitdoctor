@@ -9,7 +9,7 @@ import subprocess
 from doctor import command, repo
 
 
-def check_eligibility(verbose: bool=False) -> (bool, list):
+def check_eligibility(verbose: bool = False) -> (bool, list):
     """ Return True if repository is eligible for examination, False otherwise.
 
     Determine eligibility by whether or not a `git fsck` check passes and produces no issues.
@@ -32,7 +32,7 @@ def check_eligibility(verbose: bool=False) -> (bool, list):
     return is_eligible, issues
 
 
-def find_unreachable_objects(verbose) -> list:
+def find_unreachable_objects(verbose: bool = False) -> list:
     """ Return a list of unreachable objects eligible for a scrubdown. """
 
     cmd = 'git fsck --unreachable'
@@ -50,7 +50,7 @@ def find_unreachable_objects(verbose) -> list:
     return unreachables
 
 
-def find_unwanted_files(verbose: bool=False) -> list:
+def find_unwanted_files(verbose: bool = False) -> list:
     """ Return a list of tracked files that match a gitignore-rule.
 
     Check against any viable gitignore location; e.g. any of the following:
@@ -80,7 +80,7 @@ def find_unwanted_files(verbose: bool=False) -> list:
     return files
 
 
-def find_excluded_files(verbose: bool=False) -> list:
+def find_excluded_files(verbose: bool = False) -> list:
     """ Return a list of both tracked and untracked files that match a gitignore-rule. """
 
     cmd = 'git ls-files --others --ignored --exclude-standard'
@@ -102,7 +102,7 @@ def find_excluded_files(verbose: bool=False) -> list:
     return files
 
 
-def is_file_tracked(filepath: str, verbose: bool=False) -> bool:
+def is_file_tracked(filepath: str, verbose: bool = False) -> bool:
     """ Return True if file is tracked in current repository, False otherwise. """
 
     cmd = f'git ls-files --error-unmatch {filepath}'
@@ -118,7 +118,7 @@ def is_file_tracked(filepath: str, verbose: bool=False) -> bool:
     return result.returncode == 0
 
 
-def find_local_tags(verbose: bool=False) -> list:
+def find_local_tags(verbose: bool = False) -> list:
     """ Return a list of local tags. """
 
     cmd = 'git tag --list'
@@ -137,7 +137,7 @@ def find_local_tags(verbose: bool=False) -> list:
     return tags
 
 
-def find_remote_tags(verbose: bool=False) -> list:
+def find_remote_tags(verbose: bool = False) -> list:
     """ Return a list of remote tags. """
 
     cmd = 'git ls-remote --tags --quiet'
@@ -204,7 +204,7 @@ def get_exclusion_sources(filepaths: list, verbose: bool) -> list:
     return formatted_sources
 
 
-def contains_readme(verbose: bool=False) -> bool:
+def contains_readme(verbose: bool = False) -> bool:
     """ Return True if current repository tracks a README file at root level, False otherwise.
 
     Note that this check only applies to files tracked by the index; return True only if a README-
