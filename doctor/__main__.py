@@ -17,7 +17,7 @@ See https://github.com/jhauberg/gitdoctor for additional details.
 import sys
 import math
 
-from docopt import docopt
+from docopt import docopt  # type: ignore
 
 from doctor import exit_if_not_compatible, enable_colors, __version__
 
@@ -65,14 +65,14 @@ def main():
         report.conclude('git executable not found')
         sys.exit(1)
 
-    is_verbose = args['--verbose']
+    is_verbose: bool = args['--verbose']
 
     if not repo.exists():
         # note that this also reports False when inside the .git folder of a repository
         report.conclude('must be inside a work tree')
         sys.exit(1)
 
-    scrubdown = args['scrub']
+    scrubdown: bool = args['scrub']
 
     # determine whether repo seems to be alright and working as expected
     # if the repo has bad files, files in odd places or similar, then we can't be sure
@@ -89,12 +89,13 @@ def main():
         sys.exit(1)
 
     if scrubdown:
-        size_difference = trim(aggressively=args['--aggressive'], verbose=is_verbose)
+        aggressively: bool = args['--aggressive']
+
+        size_difference = trim(aggressively, verbose=is_verbose)
 
         if size_difference < 0:
-            size = pretty_size(size_difference)
-
-            report.conclude(f'restored approximately {size} of disk space', positive=True)
+            report.conclude(f'restored approximately {pretty_size(size_difference)} of disk space',
+                            positive=True)
     else:
         diagnose(verbose=is_verbose)
 

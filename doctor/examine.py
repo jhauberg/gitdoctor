@@ -8,8 +8,10 @@ import subprocess
 
 from doctor import command, repo
 
+from typing import List, Tuple
 
-def check_eligibility(verbose: bool = False) -> (bool, list):
+
+def check_eligibility(verbose: bool = False) -> Tuple[bool, List[str]]:
     """ Return True if repository is eligible for examination, False otherwise.
 
     Determine eligibility by whether or not a `git fsck` check passes and produces no issues.
@@ -25,14 +27,14 @@ def check_eligibility(verbose: bool = False) -> (bool, list):
         stdout=subprocess.DEVNULL,
         stderr=subprocess.PIPE)
 
-    issues = result.stderr.decode('utf-8').splitlines()
+    issues: List[str] = result.stderr.decode('utf-8').splitlines()
 
     is_eligible = result.returncode == 0 and len(issues) == 0
 
     return is_eligible, issues
 
 
-def find_unreachable_objects(verbose: bool = False) -> list:
+def find_unreachable_objects(verbose: bool = False) -> List[str]:
     """ Return a list of unreachable objects eligible for a scrubdown. """
 
     cmd = 'git fsck --unreachable'
@@ -45,12 +47,12 @@ def find_unreachable_objects(verbose: bool = False) -> list:
         stdout=subprocess.PIPE,
         stderr=subprocess.DEVNULL)
 
-    unreachables = result.stdout.decode('utf-8').splitlines()
+    unreachables: List[str] = result.stdout.decode('utf-8').splitlines()
 
     return unreachables
 
 
-def find_unwanted_files(verbose: bool = False) -> list:
+def find_unwanted_files(verbose: bool = False) -> List[str]:
     """ Return a list of tracked files that match a gitignore-rule.
 
     Check against any viable gitignore location; e.g. any of the following:
@@ -75,12 +77,12 @@ def find_unwanted_files(verbose: bool = False) -> list:
         stdout=subprocess.PIPE,
         stderr=subprocess.DEVNULL)
 
-    files = result.stdout.decode('utf-8').splitlines()
+    files: List[str] = result.stdout.decode('utf-8').splitlines()
 
     return files
 
 
-def find_excluded_files(verbose: bool = False) -> list:
+def find_excluded_files(verbose: bool = False) -> List[str]:
     """ Return a list of both tracked and untracked files that match a gitignore-rule. """
 
     cmd = 'git ls-files --others --ignored --exclude-standard'
@@ -97,7 +99,7 @@ def find_excluded_files(verbose: bool = False) -> list:
         stdout=subprocess.PIPE,
         stderr=subprocess.DEVNULL)
 
-    files = result.stdout.decode('utf-8').splitlines()
+    files: List[str] = result.stdout.decode('utf-8').splitlines()
 
     return files
 
@@ -118,7 +120,7 @@ def is_file_tracked(filepath: str, verbose: bool = False) -> bool:
     return result.returncode == 0
 
 
-def find_local_tags(verbose: bool = False) -> list:
+def find_local_tags(verbose: bool = False) -> List[str]:
     """ Return a list of local tags. """
 
     cmd = 'git tag --list'
@@ -132,12 +134,12 @@ def find_local_tags(verbose: bool = False) -> list:
         stdout=subprocess.PIPE,
         stderr=subprocess.DEVNULL)
 
-    tags = result.stdout.decode('utf-8').splitlines()
+    tags: List[str] = result.stdout.decode('utf-8').splitlines()
 
     return tags
 
 
-def find_remote_tags(verbose: bool = False) -> list:
+def find_remote_tags(verbose: bool = False) -> List[str]:
     """ Return a list of remote tags. """
 
     cmd = 'git ls-remote --tags --quiet'
@@ -151,7 +153,7 @@ def find_remote_tags(verbose: bool = False) -> list:
         stdout=subprocess.PIPE,
         stderr=subprocess.DEVNULL)
 
-    tags = result.stdout.decode('utf-8').splitlines()
+    tags: List[str] = result.stdout.decode('utf-8').splitlines()
 
     # assume format like '<commit>    refs/tags/<tag>'
     tags = [tag.split('/')[-1] for tag in tags]
@@ -159,11 +161,13 @@ def find_remote_tags(verbose: bool = False) -> list:
     return tags
 
 
-def get_exclusion_sources(filepaths: list, verbose: bool) -> list:
+def get_exclusion_sources(filepaths: List[str], verbose: bool) -> List[str]:
     """ Determine which gitignore-rule and file is the source of a file being excluded.
 
     Return a list that is synchronous and identical in length to the provided filepaths.
     """
+
+    sources: List[str] = []
 
     # to avoid exceeding max argument/commandline length, we split input into chunks if necessary
     # the chunk size is completely arbitrary, but larger is better (fewer git executions)
@@ -171,8 +175,6 @@ def get_exclusion_sources(filepaths: list, verbose: bool) -> list:
 
     if len(filepaths) > chunk_size:
         chunks = [filepaths[i:i + chunk_size] for i in range(0, len(filepaths), chunk_size)]
-
-        sources = []
 
         for chunk in chunks:
             sources.extend(get_exclusion_sources(chunk, verbose))
@@ -228,13 +230,13 @@ def contains_readme(verbose: bool = False) -> bool:
         stdout=subprocess.PIPE,
         stderr=subprocess.DEVNULL)
 
-    files = result.stdout.decode('utf-8').splitlines()
+    files: List[str] = result.stdout.decode('utf-8').splitlines()
 
     # the search can potentially result in more than one file, but that is OK
     return len(files) > 0
 
 
-def find_merged_branches(remote: str, verbose: bool) -> (list, str):
+def find_merged_branches(remote: str, verbose: bool) -> Tuple[List[str], str]:
     """ Return a list of branches that are merged with default branch on a remote. """
 
     default_branch = repo.default_branch(remote)
@@ -250,7 +252,7 @@ def find_merged_branches(remote: str, verbose: bool) -> (list, str):
         stdout=subprocess.PIPE,
         stderr=subprocess.DEVNULL)
 
-    output = result.stdout.decode('utf-8').splitlines()
+    output: List[str] = result.stdout.decode('utf-8').splitlines()
 
     # trim each output
     branches = [branch.strip() for branch in output]

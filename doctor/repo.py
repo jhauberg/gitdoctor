@@ -8,6 +8,8 @@ import os
 import re
 import subprocess
 
+from typing import List, Optional
+
 
 def can_be_examined() -> bool:
     """ Return True if git is installed. """
@@ -38,15 +40,15 @@ def exists() -> bool:
         # will exit with non-zero code if not in a git repository at all
         return False
 
-    status = result.stdout.decode('utf-8')
+    status: str = result.stdout.decode('utf-8')
 
     # certain checks require being inside the work tree; e.g. not inside .git/
     # (for example, finding unwanted files through `git ls-files -i`)
     return 'true' in status.lower()
 
 
-def has_remote() -> (bool, str):
-    """ Return True if current repository has one or more remotes, False otherwise. """
+def default_remote() -> Optional[str]:
+    """ Return the default (first listed) remote, if any, None otherwise. """
 
     result = subprocess.run([
         'git', 'remote'],
@@ -54,12 +56,12 @@ def has_remote() -> (bool, str):
         stdout=subprocess.PIPE,  # capture stdout
         stderr=subprocess.DEVNULL)  # ignore stderr
 
-    remotes = result.stdout.decode('utf-8').splitlines()
+    remotes: List[str] = result.stdout.decode('utf-8').splitlines()
 
     has_remotes = len(remotes) > 0
 
     # bias toward first listed remote; this could be wrong
-    return has_remotes, remotes[0] if has_remotes else None
+    return remotes[0] if has_remotes else None
 
 
 def default_branch(remote: str) -> str:
@@ -71,7 +73,7 @@ def default_branch(remote: str) -> str:
         stdout=subprocess.PIPE,  # capture stdout
         stderr=subprocess.DEVNULL)  # ignore stderr
 
-    output = result.stdout.decode('utf-8')
+    output: str = result.stdout.decode('utf-8')
 
     match = re.search(r'HEAD branch:(.*)', output)
 
@@ -91,7 +93,7 @@ def absolute_path() -> str:
         stdout=subprocess.PIPE,  # capture stdout
         stderr=subprocess.DEVNULL)  # ignore stderr
 
-    path = result.stdout.decode('utf-8')
+    path: str = result.stdout.decode('utf-8')
 
     return path.strip()
 

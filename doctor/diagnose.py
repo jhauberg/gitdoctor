@@ -7,6 +7,8 @@ Provides functions for diagnosing defects in the current repository.
 from doctor.report import note, conclude
 from doctor.examine import *
 
+from typing import List
+
 
 def examine_scrubdown(verbose: bool = False):
     """ Examine and diagnose whether current repository could use a scrubdown. """
@@ -42,7 +44,7 @@ def examine_unwanted_files(verbose: bool = False):
     if len(unwanted_files) == 0:
         return
 
-    sources = []
+    sources: List[str] = []
 
     if verbose:
         sources = get_exclusion_sources(unwanted_files, verbose)
@@ -130,13 +132,13 @@ def examine_missing_tags(verbose: bool = False):
                         'tags).')
 
 
-def examine_redundant_branches(remote_branch: str, verbose: bool = False):
+def examine_redundant_branches(remote: str, verbose: bool = False):
     """ Examine and diagnose whether current repository has redundant branches.
 
     This examination assumes that current repository has a remote.
     """
 
-    redundant_branches, default_branch = find_merged_branches(remote_branch, verbose)
+    redundant_branches, default_branch = find_merged_branches(remote, verbose)
 
     if len(redundant_branches) == 0:
         return
@@ -155,11 +157,11 @@ def diagnose(verbose: bool = False):
     examine_scrubdown(verbose)
     examine_readme(verbose)
 
-    has_remote, default_branch = repo.has_remote()
+    default_remote = repo.default_remote()
 
-    if has_remote:
+    if default_remote is not None:
         examine_missing_tags(verbose)
-        examine_redundant_branches(default_branch, verbose)
+        examine_redundant_branches(default_remote, verbose)
 
     examine_excluded_files(verbose)
     examine_unwanted_files(verbose)
