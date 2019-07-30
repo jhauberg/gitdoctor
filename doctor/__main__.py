@@ -95,7 +95,7 @@ def main():
 
         if size_difference < 0:
             report.conclude(f'restored approximately {pretty_size(size_difference)} of disk space',
-                            positive=True)
+                            sentiment=report.POSITIVE)
     else:
         diagnose(verbose=is_verbose)
 
