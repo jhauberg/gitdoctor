@@ -89,9 +89,7 @@ def main():
         sys.exit(1)
 
     if scrubdown:
-        aggressively: bool = args['--aggressive']
-
-        size_difference = trim(aggressively, verbose=is_verbose)
+        size_difference = trim(aggressively=args['--aggressive'], verbose=is_verbose)
 
         if size_difference < 0:
             report.conclude(f'restored approximately {pretty_size(size_difference)} of disk space',

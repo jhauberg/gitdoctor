@@ -13,7 +13,7 @@ GIT_GC = 'git gc --prune=now'
 GIT_GC_AGGRESSIVE = GIT_GC + ' --aggressive'
 
 
-def trim(aggressively: bool = False, verbose: bool = False) -> int:
+def trim(*, aggressively: bool = False, verbose: bool = False) -> int:
     """ Trim current repository and return the difference (in bytes) from before and after.
 
     The difference is negative if the repository became smaller, positive if it became larger.
