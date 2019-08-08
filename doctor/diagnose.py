@@ -10,7 +10,7 @@ from doctor.examine import *
 from typing import List
 
 
-def examine_scrubdown(*, verbose: bool = False):
+def examine_scrubdown(*, verbose: bool = False) -> None:
     """ Examine and diagnose whether current repository could use a scrubdown. """
 
     unreachables = find_unreachable_objects(verbose)
@@ -25,7 +25,7 @@ def examine_scrubdown(*, verbose: bool = False):
              supplement='Run a scrubdown using `git doctor scrub`.')
 
 
-def examine_readme(*, verbose: bool = False):
+def examine_readme(*, verbose: bool = False) -> None:
     """ Examine and diagnose whether current repository contains a README. """
 
     if contains_readme(verbose):
@@ -36,7 +36,7 @@ def examine_readme(*, verbose: bool = False):
                         'root of the repository.')
 
 
-def examine_unwanted_files(*, verbose: bool = False):
+def examine_unwanted_files(*, verbose: bool = False) -> None:
     """ Examine and diagnose whether current repository tracks unwanted files. """
 
     unwanted_files = find_unwanted_files(verbose)
@@ -64,7 +64,7 @@ def examine_unwanted_files(*, verbose: bool = False):
                         'filesystem) using `git rm <filename>`.')
 
 
-def examine_excluded_files(*, verbose: bool = False):
+def examine_excluded_files(*, verbose: bool = False) -> None:
     """ Examine and diagnose whether current repository has untracked .gitignore rules. """
 
     excluded_files = find_excluded_files(verbose)
@@ -106,7 +106,7 @@ def examine_excluded_files(*, verbose: bool = False):
                         'tracked .gitignore file would be preferable.')
 
 
-def examine_missing_tags(*, verbose: bool = False):
+def examine_missing_tags(*, verbose: bool = False) -> None:
     """ Examine and diagnose whether current repository has unpublished tags.
 
     This examination assumes that current repository has a remote.
@@ -132,7 +132,7 @@ def examine_missing_tags(*, verbose: bool = False):
                         'tags).')
 
 
-def examine_redundant_branches(remote: str, *, verbose: bool = False):
+def examine_redundant_branches(remote: str, *, verbose: bool = False) -> None:
     """ Examine and diagnose whether current repository has redundant branches.
 
     This examination assumes that current repository has a remote.
@@ -151,7 +151,7 @@ def examine_redundant_branches(remote: str, *, verbose: bool = False):
                         'they will continue to be used and are intentionally long-running.')
 
 
-def diagnose(*, verbose: bool = False):
+def diagnose(*, verbose: bool = False) -> None:
     """ Run all examinations on current repository. """
 
     examine_scrubdown(verbose=verbose)

@@ -15,7 +15,7 @@ def is_compatible() -> bool:
     return True
 
 
-def exit_if_not_compatible():
+def exit_if_not_compatible() -> None:
     """ Exit with non-zero status if system is running unsupported Python version. """
 
     if not is_compatible():
@@ -28,7 +28,7 @@ def is_windows_environment() -> bool:
     return os.name == 'nt'
 
 
-def enable_colors():
+def enable_colors() -> None:
     """ Enable terminal color support.
 
     Only has an effect on Windows.
@@ -39,7 +39,7 @@ def enable_colors():
         # see https://stackoverflow.com/a/36760881/144433
         import ctypes
 
-        kernel32 = ctypes.windll.kernel32
+        kernel32 = ctypes.windll.kernel32  # type: ignore
 
         STD_OUTPUT_HANDLE = -11
 

@@ -11,14 +11,16 @@ import doctor.report as report
 
 from doctor.report import supports_color
 
+from typing import List
 
-def get_argv(cmd: str) -> list:
+
+def get_argv(cmd: str) -> List[str]:
     """ Return a list of arguments from a fully-formed command line. """
 
     return cmd.strip().split(' ')
 
 
-def display(cmd: str):
+def display(cmd: str) -> None:
     """ Emit a diagnostic message that looks like the execution of a command line. """
 
     diagnostic = f'$ {cmd}'

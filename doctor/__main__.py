@@ -43,7 +43,7 @@ def pretty_size(size_in_bytes: int) -> str:
     return f'{size:.{precision}f}{size_type}'
 
 
-def main():
+def main() -> None:
     """ Entry point for invoking the git-doctor cli. """
 
     exit_if_not_compatible()

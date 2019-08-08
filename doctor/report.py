@@ -7,11 +7,13 @@ Provides outputting facilities for reports and diagnosis conclusions.
 import sys
 import textwrap
 
+from typing import Any, Optional
+
 NEGATIVE = -1
 POSITIVE = +1
 
 
-def supports_color(stream) -> bool:
+def supports_color(stream: Any) -> bool:
     """ Determine whether an output stream (e.g. stdout/stderr) supports displaying colored text.
 
     A stream that is redirected to a file does not support color.
@@ -20,7 +22,7 @@ def supports_color(stream) -> bool:
     return stream.isatty() and hasattr(stream, 'isatty')
 
 
-def important(message: str, *, sentiment: int = NEGATIVE):
+def important(message: str, *, sentiment: int = NEGATIVE) -> None:
     """ Emit an important diagnostic message.
 
     Important diagnostics go to stdout and are considered as a result output; i.e. output
@@ -43,7 +45,7 @@ def important(message: str, *, sentiment: int = NEGATIVE):
     print(output, file=stream)
 
 
-def information(message: str, *, wrapped: bool = True):
+def information(message: str, *, wrapped: bool = True) -> None:
     """ Emit an informative diagnostic message.
 
     Informative diagnostics go to stderr and must not be a vital resulting output.
@@ -59,7 +61,7 @@ def information(message: str, *, wrapped: bool = True):
     print(output, file=stream)
 
 
-def note(message: str):
+def note(message: str) -> None:
     """ Emit a diagnostic message related to an important diagnostic. """
 
     stream = sys.stdout
@@ -71,7 +73,7 @@ def note(message: str):
     print(output, file=stream)
 
 
-def conclude(message: str, supplement: str = None, *, sentiment: int = NEGATIVE):
+def conclude(message: str, supplement: Optional[str] = None, *, sentiment: int = NEGATIVE) -> None:
     """ Emit an important diagnostic message as the result of a diagnosis.
 
     If supported, color message according to sentiment.
