@@ -21,7 +21,7 @@ def examine_scrubdown(*, verbose: bool = False) -> None:
     for unreachable in unreachables:
         note(unreachable)
 
-    conclude(message='scrubdown is recommended',
+    conclude(message='scrubdown recommended',
              supplement='Run a scrubdown using `git doctor scrub`.')
 
 

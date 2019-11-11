@@ -69,7 +69,7 @@ def main() -> None:
 
     if not repo.exists():
         # note that this also reports False when inside the .git folder of a repository
-        report.conclude('must be inside a work tree')
+        report.conclude('not inside a work tree')
         sys.exit(1)
 
     scrubdown: bool = args['scrub']
